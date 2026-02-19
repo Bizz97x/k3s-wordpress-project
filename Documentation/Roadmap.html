@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)file:///Users/rbizet/Documents/Roadmap.html -->
+<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Roadmap K3s – WordPress – Vault – Observability – Hugo</title>
+  <style>
+    :root{
+      --bg1:#070a12; --bg2:#0a1430;
+      --card: rgba(18,26,42,.78);
+      --card2: rgba(18,26,42,.58);
+      --text:#eaf0ff; --muted:#a7b2cc; --line:#22304d;
+      --good:#22c55e; --warn:#f59e0b; --bad:#ef4444; --info:#38bdf8;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 15% 5%, rgba(56,189,248,.16), transparent 55%),
+        radial-gradient(1000px 600px at 85% 15%, rgba(34,197,94,.12), transparent 55%),
+        radial-gradient(900px 500px at 40% 90%, rgba(245,158,11,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+      min-height:100vh;
+    }
+    a{ color:inherit; }
+    .wrap{ max-width:1100px; margin:0 auto; padding:18px; }
+    header{
+      position: sticky; top:0; z-index:50;
+      backdrop-filter: blur(14px);
+      background: rgba(7,10,18,.55);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar{
+      display:flex; gap:14px; align-items:center; justify-content:space-between;
+      padding:16px 18px;
+    }
+    h1{ font-size:18px; margin:0; letter-spacing:.2px; }
+    .sub{ margin:0; color:var(--muted); font-size:13px; line-height:1.45; }
+    .controls{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .pill{
+      display:flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .pill input[type="search"]{
+      border:none; outline:none; background:transparent; color:var(--text);
+      width:240px; max-width:40vw; font-size:12px;
+    }
+    .btn{
+      cursor:pointer;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color:var(--text);
+      border-radius:12px;
+      padding:8px 10px;
+      font-size:12px;
+      display:flex; align-items:center; gap:8px;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    .btn:hover{ background: rgba(255,255,255,.06); }
+    .btn:active{ transform: translateY(1px); }
+    .btn small{ color:var(--muted); font-size:11px; }
+
+    main{ padding:18px; }
+    .stats{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center; justify-content:space-between;
+      margin-bottom:14px;
+    }
+    .progressWrap{
+      flex: 1 1 340px;
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      box-shadow: var(--shadow);
+    }
+    .progressTop{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .progressTop b{ font-size:13px; }
+    .progressTop span{ color:var(--muted); font-size:12px; }
+    .bar{
+      height:10px; border-radius:999px;
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.05);
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block; height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(56,189,248,.9), rgba(34,197,94,.9));
+      border-radius:999px;
+      transition: width .35s ease;
+    }
+    .quick{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
+      flex: 0 0 auto;
+    }
+    .mini{
+      min-width: 150px;
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      box-shadow: var(--shadow);
+      color:var(--muted);
+      font-size:12px;
+    }
+    .mini b{ color:var(--text); display:block; font-size:14px; margin-bottom:2px; }
+    .mini .dot{
+      display:inline-block; width:8px; height:8px; border-radius:999px; margin-right:6px;
+      background: var(--info);
+    }
+
+    .grid{
+      display:grid;
+      gap:14px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+    .card{
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+      transition: transform .12s ease, border-color .2s ease, background .2s ease;
+    }
+    .card:hover{ transform: translateY(-2px); background: rgba(18,26,42,.86); border-color: rgba(56,189,248,.35); }
+    .card::before{
+      content:"";
+      position:absolute; inset:-60px -60px auto auto;
+      width:140px; height:140px;
+      background: radial-gradient(circle at 30% 30%, rgba(56,189,248,.25), transparent 60%);
+      transform: rotate(10deg);
+      pointer-events:none;
+    }
+    .phaseHead{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+      margin-bottom:10px;
+    }
+    .phaseTitle{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    h2{ margin:0; font-size:15px; }
+    .meta{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+      color:var(--muted); font-size:12px;
+    }
+    .tag{
+      padding:3px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .status{
+      display:flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .status i{
+      width:10px; height:10px; border-radius:999px; display:inline-block;
+      background: var(--warn);
+      box-shadow: 0 0 0 3px rgba(245,158,11,.12);
+    }
+    .status[data-state="done"] i{ background: var(--good); box-shadow: 0 0 0 3px rgba(34,197,94,.12); }
+    .status[data-state="todo"] i{ background: var(--warn); box-shadow: 0 0 0 3px rgba(245,158,11,.12); }
+
+    .items{
+      margin:0; padding:0; list-style:none;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .item{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 10px;
+      border:1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.02);
+      border-radius:14px;
+      transition: border-color .2s ease, background .2s ease;
+    }
+    .item:hover{ border-color: rgba(56,189,248,.25); background: rgba(255,255,255,.03); }
+    .item input{
+      margin-top:2px;
+      width:18px; height:18px;
+      accent-color: #22c55e;
+      cursor:pointer;
+    }
+    .item label{
+      cursor:pointer;
+      display:block;
+      line-height:1.35;
+      font-size:13px;
+    }
+    .item small{
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
+    }
+    .item.done label{
+      text-decoration: line-through;
+      color: rgba(234,240,255,.72);
+    }
+
+    .actions{
+      margin-top:12px;
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .note{
+      margin-top:12px;
+      border:1px dashed var(--line);
+      background: rgba(255,255,255,.02);
+      border-radius:14px;
+      padding:10px 12px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+    }
+    code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      padding: 2px 6px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.03);
+      color: #d7e3ff;
+      white-space: nowrap;
+    }
+
+    .panel{
+      margin-top:14px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background: var(--card2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panelHead{
+      padding:12px 14px;
+      border-bottom:1px solid var(--line);
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+    }
+    .panelHead b{ font-size:13px; }
+    .panelBody{ padding:14px; color:var(--muted); font-size:12px; line-height:1.6; }
+    textarea{
+      width:100%;
+      min-height:110px;
+      resize: vertical;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background: rgba(7,10,18,.35);
+      color: var(--text);
+      padding:10px 12px;
+      outline:none;
+      font-size:12px;
+      line-height:1.5;
+    }
+    .kbd{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      padding:2px 7px;
+      border-radius:8px;
+      font-size:12px;
+      color:var(--muted);
+      white-space: nowrap;
+    }
+
+    .muted{ color:var(--muted); }
+    .hidden{ display:none !important; }
+
+    @media (max-width: 520px){
+      .pill input[type="search"]{ width:150px; }
+      .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="topbar wrap">
+    <div>
+      <h1>Roadmap – Projet K3s / Traefik / WordPress / Vault / Observabilité / Hugo</h1>
+      <p class="sub">Coche au fur et à mesure. Tout est sauvegardé automatiquement dans ton navigateur (localStorage).</p>
+    </div>
+    <div class="controls">
+      <div class="pill" title="Filtre (titre ou détails)">
+        🔎 <input id="search" type="search" placeholder="Filtrer… (ex: vault, https, grafana)">
+      </div>
+      <button class="btn" id="expandAll" title="Afficher/masquer toutes les phases">🧩 <span>Tout ouvrir/fermer</span></button>
+      <button class="btn" id="reset" title="Remettre toutes les cases à zéro">♻️ <span>Reset</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="stats">
+    <div class="progressWrap">
+      <div class="progressTop">
+        <b>Progression globale</b>
+        <span><span id="doneCount">3</span>/<span id="totalCount">28</span> tâches</span>
+      </div>
+      <div class="bar" aria-label="Progression">
+        <i id="barFill" style="width: 11%;"></i>
+      </div>
+    </div>
+
+    <div class="quick">
+      <div class="mini">
+        <span class="dot"></span><b id="phaseDone">1</b>
+        phases complétées
+      </div>
+      <div class="mini">
+        <span class="dot" style="background: var(--warn);"></span><b id="phaseTodo">5</b>
+        phases en cours
+      </div>
+    </div>
+  </section>
+
+  <div class="grid" id="grid">
+
+    <!-- PHASE 1 -->
+    <section class="card phase" data-phase="1">
+      <div class="phaseHead">
+        <div class="phaseTitle">
+          <h2>PHASE 1 — Socle (Cluster K3s OK)</h2>
+          <div class="meta">
+            <span class="tag">Priorité : Bloquant</span>
+            <span class="muted">Valider avant de continuer</span>
+          </div>
+        </div>
+        <div class="status" data-state="done"><i></i><span>Terminé</span></div>
+      </div>
+
+      <ul class="items">
+        <li class="item done">
+          <input type="checkbox" id="p1-1" data-key="p1-1">
+          <label for="p1-1">
+            Préparer les 3 VM
+            <small>swap off, réseau OK, ports, hostname, rôles (VM1 server / VM2-VM3 agents).</small>
+          </label>
+        </li>
+        <li class="item done">
+          <input type="checkbox" id="p1-2" data-key="p1-2">
+          <label for="p1-2">
+            Installer K3s (server + agents)
+            <small>À la fin : les 3 nœuds doivent être <code>Ready</code>.</small>
+          </label>
+        </li>
+        <li class="item done">
+          <input type="checkbox" id="p1-3" data-key="p1-3">
+          <label for="p1-3">
+            Vérifier Traefik
+            <small>Traefik tourne, dashboard accessible (8080), écoute 80/443.</small>
+          </label>
+        </li>
+      </ul>
+
+      <div class="note">✅ Critère de validation : <code>kubectl get nodes</code> = 3 Ready, Traefik OK.</div>
+      <div class="actions">
+        <button class="btn toggle" type="button">🧾 <span>Notes</span> <small>(phase 1)</small></button>
+      </div>
+      <div class="panel">
+        <div class="panelHead">
+          <b>Notes – Phase 1</b>
+          <span class="muted">Raccourci : <span class="kbd">Ctrl</span> + <span class="kbd">F</span> pour chercher</span>
+        </div>
+        <div class="panelBody">
+          <textarea data-notes="phase-1" placeholder="Colle ici tes commandes, erreurs, solutions (ex: join token, ports, etc.)…" style="height: 298px;"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHASE 2 -->
+    <section class="card phase" data-phase="2">
+      <div class="phaseHead">
+        <div class="phaseTitle">
+          <h2>PHASE 2 — WordPress en HTTP (simple)</h2>
+          <div class="meta">
+            <span class="tag">Objectif : Fonctionnel</span>
+            <span class="muted">HTTP avant HTTPS</span>
+          </div>
+        </div>
+        <div class="status" data-state="todo"><i></i><span>En cours</span></div>
+      </div>
+
+      <ul class="items">
+        <li class="item">
+          <input type="checkbox" id="p2-1" data-key="p2-1">
+          <label for="p2-1">Créer le namespace <code>wordpress</code>
+            <small>Tout WordPress + DB dedans (exigence projet).</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p2-2" data-key="p2-2">
+          <label for="p2-2">Déployer MariaDB + PVC
+            <small>Persistance DB obligatoire (redémarrage pod/nœud).</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p2-3" data-key="p2-3">
+          <label for="p2-3">Créer Secret Kubernetes “v1”
+            <small>Identifiant + mot de passe (pas en clair sur Git).</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p2-4" data-key="p2-4">
+          <label for="p2-4">Déployer WordPress + PVC + Service</label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p2-5" data-key="p2-5">
+          <label for="p2-5">Créer IngressRoute HTTP
+            <small>Accessible via <code>http://web.etna.student</code> (ou ton domaine).</small>
+          </label>
+        </li>
+      </ul>
+
+      <div class="note">✅ Critère de validation : WordPress accessible en HTTP + données persistantes.</div>
+      <div class="actions">
+        <button class="btn toggle" type="button">🧾 <span>Notes</span> <small>(phase 2)</small></button>
+      </div>
+      <div class="panel hidden">
+        <div class="panelHead"><b>Notes – Phase 2</b><span class="muted">PVC / Service / IngressRoute</span></div>
+        <div class="panelBody">
+          <textarea data-notes="phase-2" placeholder="Ex: noms des PVC, host utilisé, commandes kubectl apply, etc."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHASE 3 -->
+    <section class="card phase" data-phase="3">
+      <div class="phaseHead">
+        <div class="phaseTitle">
+          <h2>PHASE 3 — HTTPS Let’s Encrypt</h2>
+          <div class="meta">
+            <span class="tag">Objectif : Certificat valide</span>
+            <span class="muted">Traefik + LE</span>
+          </div>
+        </div>
+        <div class="status" data-state="todo"><i></i><span>En cours</span></div>
+      </div>
+
+      <ul class="items">
+        <li class="item">
+          <input type="checkbox" id="p3-1" data-key="p3-1">
+          <label for="p3-1">Activer Let’sEncrypt dans Traefik
+            <small>ConfigMap → email ETNA → copier dans <code>/var/lib/rancher/k3s/server/manifests/…</code></small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p3-2" data-key="p3-2">
+          <label for="p3-2">Ajouter IngressRoute HTTPS WordPress
+            <small>Host + resolver LE, ports 443.</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p3-3" data-key="p3-3">
+          <label for="p3-3">Tester validité du certificat
+            <small>Navigateur : cadenas OK, certificat reconnu.</small>
+          </label>
+        </li>
+      </ul>
+
+      <div class="note">✅ Critère de validation : WordPress en <code>https://…</code> avec certificat valide.</div>
+      <div class="actions">
+        <button class="btn toggle" type="button">🧾 <span>Notes</span> <small>(phase 3)</small></button>
+      </div>
+      <div class="panel hidden">
+        <div class="panelHead"><b>Notes – Phase 3</b><span class="muted">DNS/hosts + Traefik logs</span></div>
+        <div class="panelBody">
+          <textarea data-notes="phase-3" placeholder="Ex: domaine choisi, IP, erreurs LE, logs traefik…"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHASE 4 -->
+    <section class="card phase" data-phase="4">
+      <div class="phaseHead">
+        <div class="phaseTitle">
+          <h2>PHASE 4 — Vault (secrets améliorés)</h2>
+          <div class="meta">
+            <span class="tag">Objectif : Rotation + aléatoire</span>
+            <span class="muted">Helm + Injector</span>
+          </div>
+        </div>
+        <div class="status" data-state="todo"><i></i><span>En cours</span></div>
+      </div>
+
+      <ul class="items">
+        <li class="item">
+          <input type="checkbox" id="p4-1" data-key="p4-1">
+          <label for="p4-1">Installer Vault via Helm (repo officiel)
+            <small>Suivre l’installation recommandée.</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p4-2" data-key="p4-2">
+          <label for="p4-2">Init / unseal + accès admin
+            <small>Documenter les commandes et stockage des clés (hors Git).</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p4-3" data-key="p4-3">
+          <label for="p4-3">Configurer auth Kubernetes + policies
+            <small>Pour que les pods lisent les secrets.</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p4-4" data-key="p4-4">
+          <label for="p4-4">Configurer secrets engine DB
+            <small>Secrets dynamiques (users DB temporaires).</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p4-5" data-key="p4-5">
+          <label for="p4-5">Rotation hebdomadaire + génération aléatoire
+            <small>Preuve : TTL / renouvellement / nouveau user/password.</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p4-6" data-key="p4-6">
+          <label for="p4-6">Modifier les déploiements WordPress/DB
+            <small>Utiliser Vault (injector/agent) à la place du Secret K8s “v1”.</small>
+          </label>
+        </li>
+      </ul>
+
+      <div class="note">✅ Critère de validation : pods utilisent Vault + rotation weekly démontrable.</div>
+      <div class="actions">
+        <button class="btn toggle" type="button">🧾 <span>Notes</span> <small>(phase 4)</small></button>
+      </div>
+      <div class="panel hidden">
+        <div class="panelHead"><b>Notes – Phase 4</b><span class="muted">policies / auth / engine DB</span></div>
+        <div class="panelBody">
+          <textarea data-notes="phase-4" placeholder="Ex: chemins secrets, policies, roles, TTL weekly, tests…"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHASE 5 -->
+    <section class="card phase" data-phase="5">
+      <div class="phaseHead">
+        <div class="phaseTitle">
+          <h2>PHASE 5 — Observabilité</h2>
+          <div class="meta">
+            <span class="tag">Objectif : Dashboards + logs</span>
+            <span class="muted">Grafana Explore</span>
+          </div>
+        </div>
+        <div class="status" data-state="todo"><i></i><span>En cours</span></div>
+      </div>
+
+      <ul class="items">
+        <li class="item">
+          <input type="checkbox" id="p5-1" data-key="p5-1">
+          <label for="p5-1">Déployer Prometheus + Grafana (Helm)
+            <small>Collecte metrics cluster + nodes/VM.</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p5-2" data-key="p5-2">
+          <label for="p5-2">Déployer Loki + Promtail
+            <small>Logs visibles dans Grafana → Explore.</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p5-3" data-key="p5-3">
+          <label for="p5-3">Configurer datasources Grafana
+            <small>Prometheus + Loki en sources de données.</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p5-4" data-key="p5-4">
+          <label for="p5-4">Dashboard Kubernetes + VM
+            <small>CPU (limite + réel), RAM (%), connexions TCP, objets K8S + états.</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p5-5" data-key="p5-5">
+          <label for="p5-5">Dashboard services (WordPress)
+            <small>Requêtes HTTP + codes HTTP (200/401/404/500…).</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p5-6" data-key="p5-6">
+          <label for="p5-6">Maîtriser le filtrage des logs
+            <small>Ex : logs d’accès WordPress via labels/namespace/pod.</small>
+          </label>
+        </li>
+      </ul>
+
+      <div class="note">✅ Critère de validation : dashboards conformes + logs exploitables en soutenance.</div>
+      <div class="actions">
+        <button class="btn toggle" type="button">🧾 <span>Notes</span> <small>(phase 5)</small></button>
+      </div>
+      <div class="panel hidden">
+        <div class="panelHead"><b>Notes – Phase 5</b><span class="muted">datasources / dashboards / queries</span></div>
+        <div class="panelBody">
+          <textarea data-notes="phase-5" placeholder="Ex: URL grafana, user/pass (hors Git), queries PromQL, filtres Loki…"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHASE 6 -->
+    <section class="card phase" data-phase="6">
+      <div class="phaseHead">
+        <div class="phaseTitle">
+          <h2>PHASE 6 — Documentation Hugo (service)</h2>
+          <div class="meta">
+            <span class="tag">Objectif : HTTPS + Basic Auth</span>
+            <span class="muted">Docs évaluées</span>
+          </div>
+        </div>
+        <div class="status" data-state="todo"><i></i><span>En cours</span></div>
+      </div>
+
+      <ul class="items">
+        <li class="item">
+          <input type="checkbox" id="p6-1" data-key="p6-1">
+          <label for="p6-1">Créer le site Hugo (thème au choix)</label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p6-2" data-key="p6-2">
+          <label for="p6-2">Déployer Hugo sur le cluster
+            <small>Namespace <code>docs</code>, service + ingress.</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p6-3" data-key="p6-3">
+          <label for="p6-3">HTTPS Let’sEncrypt
+            <small>URL type <code>https://docs.etna.student</code>.</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p6-4" data-key="p6-4">
+          <label for="p6-4">Authentification basique
+            <small>Middleware Traefik BasicAuth (credentials hors Git).</small>
+          </label>
+        </li>
+        <li class="item">
+          <input type="checkbox" id="p6-5" data-key="p6-5">
+          <label for="p6-5">Rédiger une doc par service
+            <small>WordPress/DB, Traefik+LE, Vault, Observability, Hugo + liens repo.</small>
+          </label>
+        </li>
+      </ul>
+
+      <div class="note">✅ Critère de validation : site doc accessible en HTTPS + login obligatoire.</div>
+      <div class="actions">
+        <button class="btn toggle" type="button">🧾 <span>Notes</span> <small>(phase 6)</small></button>
+      </div>
+      <div class="panel hidden">
+        <div class="panelHead"><b>Notes – Phase 6</b><span class="muted">Hugo + BasicAuth</span></div>
+        <div class="panelBody">
+          <textarea data-notes="phase-6" placeholder="Ex: structure doc, URLs, étapes déploiement, captures à ajouter…"></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" style="margin-top:16px;">
+    <div class="panelHead">
+      <b>Checklist “Soutenance”</b>
+      <span class="muted">à compléter au besoin</span>
+    </div>
+    <div class="panelBody">
+      <ul style="margin:0; padding-left:18px;">
+        <li>Montrer : 3 nodes Ready + Traefik OK</li>
+        <li>Montrer : WordPress HTTP + persistance (redémarrage pod)</li>
+        <li>Montrer : HTTPS + certificat valide</li>
+        <li>Montrer : Vault (status/unseal) + génération/rotation weekly</li>
+        <li>Montrer : Grafana dashboards + Explore logs (accès WordPress)</li>
+        <li>Montrer : Hugo docs HTTPS + basic auth</li>
+      </ul>
+    </div>
+  </section>
+
+  <p class="muted" style="margin:14px 2px 0; font-size:12px;">
+    Astuce : fais un commit à chaque phase validée (Phase 1 OK → commit, etc.). Tu peux aussi ajouter des tâches directement en dupliquant une ligne <code>&lt;li class="item"&gt;…</code>.
+  </p>
+</main>
+
+<script>
+  // --- Storage keys
+  const STORE_KEY = "k3s_roadmap_checks_v1";
+  const NOTES_KEY = "k3s_roadmap_notes_v1";
+  const UI_KEY    = "k3s_roadmap_ui_v1";
+
+  const $ = (sel, el=document) => el.querySelector(sel);
+  const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
+
+  const checkboxes = $$('input[type="checkbox"][data-key]');
+  const notesAreas = $$('textarea[data-notes]');
+  const phases = $$('.phase');
+
+  function loadJSON(key, fallback){
+    try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+    catch { return fallback; }
+  }
+  function saveJSON(key, value){
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function applySavedState(){
+    const saved = loadJSON(STORE_KEY, {});
+    checkboxes.forEach(cb => { cb.checked = !!saved[cb.dataset.key]; });
+
+    const notes = loadJSON(NOTES_KEY, {});
+    notesAreas.forEach(ta => { ta.value = notes[ta.dataset.notes] ?? ""; });
+
+    const ui = loadJSON(UI_KEY, { expanded: {} });
+    phases.forEach(ph => {
+      const n = ph.dataset.phase;
+      const panel = $(".panel", ph);
+      if (!panel) return;
+      const expanded = !!ui.expanded[n];
+      panel.classList.toggle("hidden", !expanded);
+    });
+  }
+
+  function updateUI(){
+    // mark done items
+    checkboxes.forEach(cb => {
+      const item = cb.closest(".item");
+      if (!item) return;
+      item.classList.toggle("done", cb.checked);
+    });
+
+    // global progress
+    const total = checkboxes.length;
+    const done = checkboxes.filter(cb => cb.checked).length;
+    $("#totalCount").textContent = total;
+    $("#doneCount").textContent = done;
+
+    const pct = total ? Math.round((done/total)*100) : 0;
+    $("#barFill").style.width = pct + "%";
+
+    // phase statuses
+    let phaseDone = 0, phaseTodo = 0;
+    phases.forEach(ph => {
+      const cbs = $$('input[type="checkbox"][data-key]', ph);
+      const t = cbs.length;
+      const d = cbs.filter(x => x.checked).length;
+
+      const status = $(".status", ph);
+      if (!status) return;
+
+      const isDone = (t > 0 && d === t);
+      status.dataset.state = isDone ? "done" : "todo";
+      status.querySelector("span").textContent = isDone ? "Terminé" : "En cours";
+
+      if (isDone) phaseDone++; else phaseTodo++;
+
+      // hide by search
+      const q = ($("#search").value || "").trim().toLowerCase();
+      const text = ph.innerText.toLowerCase();
+      ph.classList.toggle("hidden", q && !text.includes(q));
+    });
+
+    $("#phaseDone").textContent = phaseDone;
+    $("#phaseTodo").textContent = phaseTodo;
+  }
+
+  function persistChecks(){
+    const data = {};
+    checkboxes.forEach(cb => data[cb.dataset.key] = cb.checked);
+    saveJSON(STORE_KEY, data);
+  }
+
+  function persistNotes(){
+    const data = {};
+    notesAreas.forEach(ta => data[ta.dataset.notes] = ta.value);
+    saveJSON(NOTES_KEY, data);
+  }
+
+  function persistUI(){
+    const ui = loadJSON(UI_KEY, { expanded: {} });
+    phases.forEach(ph => {
+      const n = ph.dataset.phase;
+      const panel = $(".panel", ph);
+      if (!panel) return;
+      ui.expanded[n] = !panel.classList.contains("hidden");
+    });
+    saveJSON(UI_KEY, ui);
+  }
+
+  // Events: checkboxes
+  checkboxes.forEach(cb => {
+    cb.addEventListener("change", () => {
+      persistChecks();
+      updateUI();
+    });
+  });
+
+  // Events: notes
+  notesAreas.forEach(ta => {
+    ta.addEventListener("input", () => {
+      persistNotes();
+    });
+  });
+
+  // Toggle notes panels
+  $$(".toggle").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const phase = btn.closest(".phase");
+      const panel = $(".panel", phase);
+      panel.classList.toggle("hidden");
+      persistUI();
+    });
+  });
+
+  // Search
+  $("#search").addEventListener("input", updateUI);
+
+  // Expand/collapse all
+  let allOpen = false;
+  $("#expandAll").addEventListener("click", () => {
+    allOpen = !allOpen;
+    phases.forEach(ph => {
+      const panel = $(".panel", ph);
+      if (!panel) return;
+      panel.classList.toggle("hidden", !allOpen);
+    });
+    persistUI();
+  });
+
+  // Reset
+  $("#reset").addEventListener("click", () => {
+    if (!confirm("Reset : décocher toutes les tâches et effacer les notes ?")) return;
+    checkboxes.forEach(cb => cb.checked = false);
+    notesAreas.forEach(ta => ta.value = "");
+    localStorage.removeItem(STORE_KEY);
+    localStorage.removeItem(NOTES_KEY);
+    updateUI();
+  });
+
+  // Init
+  applySavedState();
+  updateUI();
+</script>
+
+
+</body></html>

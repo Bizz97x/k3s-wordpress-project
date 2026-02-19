@@ -4,9 +4,9 @@
 
 | VM | Role | Ressources |
 | --- | --- | --- |
-| VM1 | `k3s-server` | 2 vCPU / 4 GB RAM |
-| VM2 | `k3s-agent-1` | 1 vCPU / 1 GB RAM |
-| VM3 | `k3s-agent-2` | 1 vCPU / 1 GB RAM |
+| VM-SERVER | `k3s-server` | 2 vCPU / 4 GB RAM |
+| VM2-Agent | `k3s-agent-1` | 1 vCPU / 1 GB RAM |
+| VM3-Agent | `k3s-agent-2` | 1 vCPU / 1 GB RAM |
 
 ## Installation de K3s
 
