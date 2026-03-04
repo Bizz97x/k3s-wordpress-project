@@ -320,10 +320,10 @@
     <div class="progressWrap">
       <div class="progressTop">
         <b>Progression globale</b>
-        <span><span id="doneCount">3</span>/<span id="totalCount">28</span> tâches</span>
+        <span><span id="doneCount">5</span>/<span id="totalCount">28</span> tâches</span>
       </div>
       <div class="bar" aria-label="Progression">
-        <i id="barFill" style="width: 11%;"></i>
+        <i id="barFill" style="width: 18%;"></i>
       </div>
     </div>
 
@@ -356,21 +356,21 @@
 
       <ul class="items">
         <li class="item done">
-          <input type="checkbox" id="p1-1" data-key="p1-1">
+          <input type="checkbox" id="p1-1" data-key="p1-1" checked>
           <label for="p1-1">
             Préparer les 3 VM
             <small>swap off, réseau OK, ports, hostname, rôles (VM1 server / VM2-VM3 agents).</small>
           </label>
         </li>
         <li class="item done">
-          <input type="checkbox" id="p1-2" data-key="p1-2">
+          <input type="checkbox" id="p1-2" data-key="p1-2" checked>
           <label for="p1-2">
             Installer K3s (server + agents)
             <small>À la fin : les 3 nœuds doivent être <code>Ready</code>.</small>
           </label>
         </li>
         <li class="item done">
-          <input type="checkbox" id="p1-3" data-key="p1-3">
+          <input type="checkbox" id="p1-3" data-key="p1-3" checked>
           <label for="p1-3">
             Vérifier Traefik
             <small>Traefik tourne, dashboard accessible (8080), écoute 80/443.</small>
@@ -407,8 +407,8 @@
       </div>
 
       <ul class="items">
-        <li class="item">
-          <input type="checkbox" id="p2-1" data-key="p2-1">
+        <li class="item done">
+          <input type="checkbox" id="p2-1" data-key="p2-1" checked>
           <label for="p2-1">Créer le namespace <code>wordpress</code>
             <small>Tout WordPress + DB dedans (exigence projet).</small>
           </label>
@@ -419,8 +419,8 @@
             <small>Persistance DB obligatoire (redémarrage pod/nœud).</small>
           </label>
         </li>
-        <li class="item">
-          <input type="checkbox" id="p2-3" data-key="p2-3">
+        <li class="item done">
+          <input type="checkbox" id="p2-3" data-key="p2-3" checked>
           <label for="p2-3">Créer Secret Kubernetes “v1”
             <small>Identifiant + mot de passe (pas en clair sur Git).</small>
           </label>
@@ -437,7 +437,7 @@
         </li>
       </ul>
 
-      <div class="note">✅ Critère de validation : WordPress accessible en HTTP + données persistantes.</div>
+      <div class="note">Avancement: namespace + secret créés. Prochaine étape: déployer MariaDB + PVC.</div>
       <div class="actions">
         <button class="btn toggle" type="button">🧾 <span>Notes</span> <small>(phase 2)</small></button>
       </div>
@@ -724,8 +724,12 @@
   }
 
   function applySavedState(){
-    const saved = loadJSON(STORE_KEY, {});
-    checkboxes.forEach(cb => { cb.checked = !!saved[cb.dataset.key]; });
+    const saved = loadJSON(STORE_KEY, null);
+    checkboxes.forEach(cb => {
+      if (saved && Object.prototype.hasOwnProperty.call(saved, cb.dataset.key)) {
+        cb.checked = !!saved[cb.dataset.key];
+      }
+    });
 
     const notes = loadJSON(NOTES_KEY, {});
     notesAreas.forEach(ta => { ta.value = notes[ta.dataset.notes] ?? ""; });
