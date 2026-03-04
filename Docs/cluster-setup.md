@@ -59,3 +59,27 @@ kubectl get pods -A
 ```
 
 Résultat attendu: un pod Traefik actif dans le namespace `kube-system`
+
+## Avancement actuel (Phase 2 - WordPress)
+
+- Namespace `wordpress` cree
+  - manifeste: `k8s/wordpress/namespace.yaml`
+- Secret Kubernetes `wp-db-secret` cree
+  - manifeste: `k8s/wordpress/secret-db.yaml`
+- Prochaine etape: deployer MariaDB + PVC
+
+## Arborescence actuelle
+
+```text
+group-1070802/
+├── README.md
+├── Docs/
+│   ├── Roadmap.html
+│   ├── Roadmap.md
+│   └── cluster-setup.md
+└── k8s/
+    └── wordpress/
+        ├── namespace.yaml
+        ├── secret-db.exemple.yaml
+        └── secret-db.yaml
+```
