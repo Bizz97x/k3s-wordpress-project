@@ -4,7 +4,7 @@
 
 ## Progression actuelle
 
-- Taches completees: `3 / 28`
+- Taches completees: `5 / 28`
 - Phases completees: `1 / 6`
 - Etat global: `Phase 1 terminee`, `Phases 2 a 6 en cours`
 
@@ -34,15 +34,21 @@
 
 ### Taches
 
-- [ ] Creer le namespace `wordpress`
+- [x] Creer le namespace `wordpress`
   - tout WordPress + DB dans ce namespace
 - [ ] Deployer MariaDB + PVC
   - persistance DB obligatoire (redemarrage pod/noeud)
-- [ ] Creer Secret Kubernetes `v1`
+- [x] Creer Secret Kubernetes `v1`
   - identifiant + mot de passe (jamais en clair dans Git)
 - [ ] Deployer WordPress + PVC + Service
 - [ ] Creer IngressRoute HTTP
   - acces via `http://web.etna.student` (ou domaine equivalent)
+
+### Avancement
+
+- Namespace `wordpress` cree (`k8s/wordpress/namespace.yaml`)
+- Secret Kubernetes `wp-db-secret` cree (`k8s/wordpress/secret-db.yaml`)
+- Prochaine etape: deployer MariaDB + PVC
 
 ### Critere de validation
 
