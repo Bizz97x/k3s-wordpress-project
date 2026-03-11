@@ -48,7 +48,8 @@
 
 - Namespace `wordpress` cree (`k8s/wordpress/namespace.yaml`)
 - Secret Kubernetes `wp-db-secret` cree (`k8s/wordpress/secret-db.yaml`)
-- Prochaine etape: deployer MariaDB + PVC
+- Manifeste PVC MariaDB cree (`k8s/wordpress/mariadb-pcv.yaml`)
+- Prochaine etape: deployer MariaDB (Deployment + Service) avec le PVC `mariadb-pvc`
 
 ### Critere de validation
 

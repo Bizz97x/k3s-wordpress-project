@@ -66,7 +66,9 @@ Résultat attendu: un pod Traefik actif dans le namespace `kube-system`
   - manifeste: `k8s/wordpress/namespace.yaml`
 - Secret Kubernetes `wp-db-secret` cree
   - manifeste: `k8s/wordpress/secret-db.yaml`
-- Prochaine etape: deployer MariaDB + PVC
+- Manifeste PVC MariaDB cree
+  - manifeste: `k8s/wordpress/mariadb-pcv.yaml`
+- Prochaine etape: deployer MariaDB (Deployment + Service) avec le PVC `mariadb-pvc`
 
 ## Arborescence actuelle
 
@@ -79,6 +81,7 @@ group-1070802/
 │   └── cluster-setup.md
 └── k8s/
     └── wordpress/
+        ├── mariadb-pcv.yaml
         ├── namespace.yaml
         ├── secret-db.exemple.yaml
         └── secret-db.yaml
