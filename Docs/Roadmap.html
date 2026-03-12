@@ -416,7 +416,7 @@
         <li class="item">
           <input type="checkbox" id="p2-2" data-key="p2-2">
           <label for="p2-2">Déployer MariaDB + PVC
-            <small>Persistance DB obligatoire (redémarrage pod/nœud). PVC créé, déploiement MariaDB restant.</small>
+            <small>Persistance DB obligatoire (redémarrage pod/nœud). PVC + Deployment créés, Service MariaDB restant.</small>
           </label>
         </li>
         <li class="item done">
@@ -437,7 +437,7 @@
         </li>
       </ul>
 
-      <div class="note">Avancement: namespace + secret créés, PVC MariaDB créé. Prochaine étape: déployer MariaDB (Deployment + Service).</div>
+      <div class="note">Avancement: namespace + secret créés, PVC + Deployment MariaDB créés. Prochaine étape: créer le Service MariaDB puis déployer WordPress.</div>
       <div class="actions">
         <button class="btn toggle" type="button">🧾 <span>Notes</span> <small>(phase 2)</small></button>
       </div>
