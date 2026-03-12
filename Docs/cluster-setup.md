@@ -60,6 +60,40 @@ kubectl get pods -A
 
 Résultat attendu: un pod Traefik actif dans le namespace `kube-system`
 
+## Deploiement WordPress (Phase 2)
+
+### 1. Creer le namespace `wordpress`
+
+```bash
+kubectl apply -f k8s/wordpress/namespace.yaml
+```
+
+### 2. Creer le secret base de donnees
+
+```bash
+kubectl apply -f k8s/wordpress/secret-db.yaml
+```
+
+### 3. Creer le volume persistant MariaDB (PVC)
+
+```bash
+kubectl apply -f k8s/wordpress/mariadb-pcv.yaml
+```
+
+### 4. Deployer MariaDB
+
+```bash
+kubectl apply -f k8s/wordpress/mariadb-deployment.yaml
+```
+
+### 5. Verification
+
+```bash
+kubectl get all -n wordpress
+kubectl get pvc -n wordpress
+kubectl get secrets -n wordpress
+```
+
 ## Avancement actuel (Phase 2 - WordPress)
 
 - Namespace `wordpress` cree
