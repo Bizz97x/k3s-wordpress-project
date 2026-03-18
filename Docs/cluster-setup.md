@@ -86,7 +86,13 @@ kubectl apply -f k8s/wordpress/mariadb-pcv.yaml
 kubectl apply -f k8s/wordpress/mariadb-deployment.yaml
 ```
 
-### 5. Verification
+### 5. Creer le service MariaDB
+
+```bash
+kubectl apply -f k8s/wordpress/mariadb-service.yaml
+```
+
+### 6. Verification
 
 ```bash
 kubectl get all -n wordpress
@@ -104,7 +110,9 @@ kubectl get secrets -n wordpress
   - manifeste: `k8s/wordpress/mariadb-pcv.yaml`
 - Manifeste Deployment MariaDB cree
   - manifeste: `k8s/wordpress/mariadb-deployment.yaml`
-- Prochaine etape: creer le Service MariaDB, puis deployer WordPress + Service
+- Manifeste Service MariaDB cree
+  - manifeste: `k8s/wordpress/mariadb-service.yaml`
+- Prochaine etape: deployer WordPress + Service
 
 ## Arborescence actuelle
 
@@ -119,6 +127,7 @@ group-1070802/
     └── wordpress/
         ├── mariadb-deployment.yaml
         ├── mariadb-pcv.yaml
+        ├── mariadb-service.yaml
         ├── namespace.yaml
         ├── secret-db.exemple.yaml
         └── secret-db.yaml

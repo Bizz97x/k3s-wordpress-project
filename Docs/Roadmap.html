@@ -320,10 +320,10 @@
     <div class="progressWrap">
       <div class="progressTop">
         <b>Progression globale</b>
-        <span><span id="doneCount">5</span>/<span id="totalCount">28</span> tâches</span>
+        <span><span id="doneCount">6</span>/<span id="totalCount">28</span> tâches</span>
       </div>
       <div class="bar" aria-label="Progression">
-        <i id="barFill" style="width: 18%;"></i>
+        <i id="barFill" style="width: 21%;"></i>
       </div>
     </div>
 
@@ -413,10 +413,10 @@
             <small>Tout WordPress + DB dedans (exigence projet).</small>
           </label>
         </li>
-        <li class="item">
-          <input type="checkbox" id="p2-2" data-key="p2-2">
+        <li class="item done">
+          <input type="checkbox" id="p2-2" data-key="p2-2" checked>
           <label for="p2-2">Déployer MariaDB + PVC
-            <small>Persistance DB obligatoire (redémarrage pod/nœud). PVC + Deployment créés, Service MariaDB restant.</small>
+            <small>Persistance DB obligatoire (redémarrage pod/nœud). PVC + Deployment + Service MariaDB créés.</small>
           </label>
         </li>
         <li class="item done">
@@ -437,7 +437,7 @@
         </li>
       </ul>
 
-      <div class="note">Avancement: namespace + secret créés, PVC + Deployment MariaDB créés. Prochaine étape: créer le Service MariaDB puis déployer WordPress.</div>
+      <div class="note">Avancement: namespace + secret créés, PVC + Deployment + Service MariaDB créés. Prochaine étape: déployer WordPress + Service.</div>
       <div class="actions">
         <button class="btn toggle" type="button">🧾 <span>Notes</span> <small>(phase 2)</small></button>
       </div>

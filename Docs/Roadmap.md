@@ -4,7 +4,7 @@
 
 ## Progression actuelle
 
-- Taches completees: `5 / 28`
+- Taches completees: `6 / 28`
 - Phases completees: `1 / 6`
 - Etat global: `Phase 1 terminee`, `Phases 2 a 6 en cours`
 
@@ -36,7 +36,7 @@
 
 - [x] Creer le namespace `wordpress`
   - tout WordPress + DB dans ce namespace
-- [ ] Deployer MariaDB + PVC
+- [x] Deployer MariaDB + PVC
   - persistance DB obligatoire (redemarrage pod/noeud)
 - [x] Creer Secret Kubernetes `v1`
   - identifiant + mot de passe (jamais en clair dans Git)
@@ -50,7 +50,8 @@
 - Secret Kubernetes `wp-db-secret` cree (`k8s/wordpress/secret-db.yaml`)
 - Manifeste PVC MariaDB cree (`k8s/wordpress/mariadb-pcv.yaml`)
 - Manifeste Deployment MariaDB cree (`k8s/wordpress/mariadb-deployment.yaml`)
-- Prochaine etape: creer le Service MariaDB, puis deployer WordPress + Service
+- Manifeste Service MariaDB cree (`k8s/wordpress/mariadb-service.yaml`)
+- Prochaine etape: deployer WordPress + Service
 
 ### Critere de validation
 
