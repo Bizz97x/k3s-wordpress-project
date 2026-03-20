@@ -56,6 +56,7 @@ Traefik est installé automatiquement avec K3s par défaut.
 
 ```bash
 kubectl get pods -A
+kubectl get svc traefik -n kube-system
 ```
 
 Résultat attendu: un pod Traefik actif dans le namespace `kube-system`
