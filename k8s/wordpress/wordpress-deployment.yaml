@@ -36,3 +36,10 @@ spec:
             secretKeyRef:
               name: wp-db-secret
               key: MYSQL_PASSWORD
+        volumeMounts:
+        - name: wordpress-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: wordpress-storage
+        persistentVolumeClaim:
+          claimName: wordpress-pvc
