@@ -20,10 +20,13 @@ Phase 2 en cours :
 - PVC MariaDB créé
 - Deployment MariaDB créé
 - Service MariaDB créé
+- Deployment WordPress créé
+- Service WordPress créé
+- Ingress HTTP WordPress créé
 
 Prochaine étape :
-- Déployer WordPress avec son Service
-- Ajouter l'Ingress HTTP
+- Ajouter la persistance WordPress
+- Tester l'accès HTTP à WordPress
 
 ## Arborescence principale
 
@@ -37,11 +40,14 @@ group-1070802/
 └── k8s/
     └── wordpress/
         ├── mariadb-deployment.yaml
-        ├── mariadb-pcv.yaml
+        ├── mariadb-pvc.yaml
         ├── mariadb-service.yaml
         ├── namespace.yaml
         ├── secret-db.exemple.yaml
-        └── secret-db.yaml
+        ├── secret-db.yaml
+        ├── wordpress-deployment.yaml
+        ├── wordpress-ingest.yaml
+        └── wordpress-services.yaml
 ```
 
 ## Documentation

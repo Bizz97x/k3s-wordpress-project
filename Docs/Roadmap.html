@@ -427,17 +427,19 @@
         </li>
         <li class="item">
           <input type="checkbox" id="p2-4" data-key="p2-4">
-          <label for="p2-4">Déployer WordPress + PVC + Service</label>
+          <label for="p2-4">Déployer WordPress + PVC + Service
+            <small>Deployment + Service créés, PVC WordPress restant.</small>
+          </label>
         </li>
         <li class="item">
           <input type="checkbox" id="p2-5" data-key="p2-5">
-          <label for="p2-5">Créer IngressRoute HTTP
-            <small>Accessible via <code>http://web.etna.student</code> (ou ton domaine).</small>
+          <label for="p2-5">Créer Ingress HTTP
+            <small>Manifeste Ingress créé avec Traefik, host actuel <code>wordpress.local</code>.</small>
           </label>
         </li>
       </ul>
 
-      <div class="note">Avancement: namespace + secret créés, PVC + Deployment + Service MariaDB créés. Prochaine étape: déployer WordPress + Service.</div>
+      <div class="note">Avancement: MariaDB complet côté manifests, WordPress Deployment + Service + Ingress créés. Prochaine étape: ajouter la persistance WordPress puis tester l'accès HTTP.</div>
       <div class="actions">
         <button class="btn toggle" type="button">🧾 <span>Notes</span> <small>(phase 2)</small></button>
       </div>

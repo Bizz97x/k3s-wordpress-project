@@ -78,7 +78,7 @@ kubectl apply -f k8s/wordpress/secret-db.yaml
 ### 3. Creer le volume persistant MariaDB (PVC)
 
 ```bash
-kubectl apply -f k8s/wordpress/mariadb-pcv.yaml
+kubectl apply -f k8s/wordpress/mariadb-pvc.yaml
 ```
 
 ### 4. Deployer MariaDB
@@ -93,12 +93,31 @@ kubectl apply -f k8s/wordpress/mariadb-deployment.yaml
 kubectl apply -f k8s/wordpress/mariadb-service.yaml
 ```
 
-### 6. Verification
+### 6. Deployer WordPress
+
+```bash
+kubectl apply -f k8s/wordpress/wordpress-deployment.yaml
+```
+
+### 7. Creer le service WordPress
+
+```bash
+kubectl apply -f k8s/wordpress/wordpress-services.yaml
+```
+
+### 8. Creer l'Ingress HTTP WordPress
+
+```bash
+kubectl apply -f k8s/wordpress/wordpress-ingest.yaml
+```
+
+### 9. Verification
 
 ```bash
 kubectl get all -n wordpress
 kubectl get pvc -n wordpress
 kubectl get secrets -n wordpress
+kubectl get ingress -n wordpress
 ```
 
 ## Avancement actuel (Phase 2 - WordPress)
@@ -108,12 +127,18 @@ kubectl get secrets -n wordpress
 - Secret Kubernetes `wp-db-secret` cree
   - manifeste: `k8s/wordpress/secret-db.yaml`
 - Manifeste PVC MariaDB cree
-  - manifeste: `k8s/wordpress/mariadb-pcv.yaml`
+  - manifeste: `k8s/wordpress/mariadb-pvc.yaml`
 - Manifeste Deployment MariaDB cree
   - manifeste: `k8s/wordpress/mariadb-deployment.yaml`
 - Manifeste Service MariaDB cree
   - manifeste: `k8s/wordpress/mariadb-service.yaml`
-- Prochaine etape: deployer WordPress + Service
+- Manifeste Deployment WordPress cree
+  - manifeste: `k8s/wordpress/wordpress-deployment.yaml`
+- Manifeste Service WordPress cree
+  - manifeste: `k8s/wordpress/wordpress-services.yaml`
+- Manifeste Ingress HTTP WordPress cree
+  - manifeste: `k8s/wordpress/wordpress-ingest.yaml`
+- Prochaine etape: ajouter la persistance WordPress puis tester l'acces HTTP
 
 ## Arborescence actuelle
 
@@ -127,9 +152,12 @@ group-1070802/
 └── k8s/
     └── wordpress/
         ├── mariadb-deployment.yaml
-        ├── mariadb-pcv.yaml
+        ├── mariadb-pvc.yaml
         ├── mariadb-service.yaml
         ├── namespace.yaml
         ├── secret-db.exemple.yaml
-        └── secret-db.yaml
+        ├── secret-db.yaml
+        ├── wordpress-deployment.yaml
+        ├── wordpress-ingest.yaml
+        └── wordpress-services.yaml
 ```

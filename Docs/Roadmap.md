@@ -41,17 +41,20 @@
 - [x] Creer Secret Kubernetes `v1`
   - identifiant + mot de passe (jamais en clair dans Git)
 - [ ] Deployer WordPress + PVC + Service
-- [ ] Creer IngressRoute HTTP
+- [ ] Creer Ingress HTTP
   - acces via `http://web.etna.student` (ou domaine equivalent)
 
 ### Avancement
 
 - Namespace `wordpress` cree (`k8s/wordpress/namespace.yaml`)
 - Secret Kubernetes `wp-db-secret` cree (`k8s/wordpress/secret-db.yaml`)
-- Manifeste PVC MariaDB cree (`k8s/wordpress/mariadb-pcv.yaml`)
+- Manifeste PVC MariaDB cree (`k8s/wordpress/mariadb-pvc.yaml`)
 - Manifeste Deployment MariaDB cree (`k8s/wordpress/mariadb-deployment.yaml`)
 - Manifeste Service MariaDB cree (`k8s/wordpress/mariadb-service.yaml`)
-- Prochaine etape: deployer WordPress + Service
+- Manifeste Deployment WordPress cree (`k8s/wordpress/wordpress-deployment.yaml`)
+- Manifeste Service WordPress cree (`k8s/wordpress/wordpress-services.yaml`)
+- Manifeste Ingress HTTP WordPress cree (`k8s/wordpress/wordpress-ingest.yaml`)
+- Prochaine etape: ajouter la persistance WordPress puis tester l'acces HTTP
 
 ### Critere de validation
 
