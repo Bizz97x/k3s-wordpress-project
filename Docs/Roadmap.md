@@ -4,7 +4,7 @@
 
 ## Progression actuelle
 
-- Taches completees: `6 / 28`
+- Taches completees: `7 / 29`
 - Phases completees: `1 / 6`
 - Etat global: `Phase 1 terminee`, `Phases 2 a 6 en cours`
 
@@ -35,14 +35,17 @@
 ### Taches
 
 - [x] Creer le namespace `wordpress`
-  - tout WordPress + DB dans ce namespace
-- [x] Deployer MariaDB + PVC
-  - persistance DB obligatoire (redemarrage pod/noeud)
+  - manifeste present dans `k8s/wordpress/namespace.yaml`
 - [x] Creer Secret Kubernetes `v1`
-  - identifiant + mot de passe (jamais en clair dans Git)
-- [ ] Deployer WordPress + PVC + Service
-- [ ] Creer Ingress HTTP
-  - acces via `http://web.etna.student` (ou domaine equivalent)
+  - manifeste present dans `k8s/wordpress/secret-db.yaml`
+- [x] Preparer les manifests MariaDB
+  - PVC `mariadb-pvc`, Deployment `mariadb`, Service `mariadb`
+- [x] Preparer les manifests WordPress HTTP
+  - Deployment `wordpress`, Service `wordpress`, Ingress HTTP `web.etna.student`
+- [ ] Ajouter la persistance WordPress
+  - aucun PVC / volume WordPress visible dans les manifests actuels
+- [ ] Appliquer et valider la stack WordPress en HTTP
+  - aucune preuve visible dans les fichiers d'un deploiement teste et valide en HTTP
 
 ### Avancement
 
@@ -55,12 +58,14 @@
 - Manifeste Service WordPress cree (`k8s/wordpress/wordpress-services.yaml`)
 - Manifeste Ingress HTTP WordPress cree (`k8s/wordpress/wordpress-ingest.yaml`)
 - Host HTTP actuel: `web.etna.student`
-- Prochaine etape: ajouter la persistance WordPress puis tester l'acces HTTP
+- Persistance WordPress absente des manifests actuels
+- Note: les manifests existent, mais aucune validation fonctionnelle HTTP n'est visible dans les fichiers
+- Prochaine etape: ajouter la persistance WordPress, appliquer les manifests puis tester l'acces HTTP
 
 ### Critere de validation
 
 - WordPress accessible en HTTP
-- Donnees persistantes
+- Donnees persistantes (MariaDB + WordPress)
 
 ## Phase 3 - HTTPS Let's Encrypt - En cours
 
