@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-  - host: wordpress.local
+  - host: web.etna.student
     http:
       paths:
       - path: /
