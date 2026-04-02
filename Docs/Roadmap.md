@@ -54,6 +54,7 @@
 - Manifeste Deployment WordPress cree (`k8s/wordpress/wordpress-deployment.yaml`)
 - Manifeste Service WordPress cree (`k8s/wordpress/wordpress-services.yaml`)
 - Manifeste Ingress HTTP WordPress cree (`k8s/wordpress/wordpress-ingest.yaml`)
+- Host HTTP actuel: `web.etna.student`
 - Prochaine etape: ajouter la persistance WordPress puis tester l'acces HTTP
 
 ### Critere de validation

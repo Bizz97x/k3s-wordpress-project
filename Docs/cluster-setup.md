@@ -138,6 +138,7 @@ kubectl get ingress -n wordpress
   - manifeste: `k8s/wordpress/wordpress-services.yaml`
 - Manifeste Ingress HTTP WordPress cree
   - manifeste: `k8s/wordpress/wordpress-ingest.yaml`
+- Host HTTP actuel: `web.etna.student`
 - Prochaine etape: ajouter la persistance WordPress puis tester l'acces HTTP
 
 ## Arborescence actuelle

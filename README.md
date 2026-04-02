@@ -23,6 +23,7 @@ Phase 2 en cours :
 - Deployment WordPress créé
 - Service WordPress créé
 - Ingress HTTP WordPress créé
+- Host HTTP actuel : `web.etna.student`
 
 Prochaine étape :
 - Ajouter la persistance WordPress
