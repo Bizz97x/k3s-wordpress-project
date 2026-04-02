@@ -20,13 +20,14 @@ Phase 2 en cours :
 - PVC MariaDB créé
 - Deployment MariaDB créé
 - Service MariaDB créé
+- PVC WordPress créé
 - Deployment WordPress créé
 - Service WordPress créé
 - Ingress HTTP WordPress créé
 - Host HTTP actuel : `web.etna.student`
 
 Prochaine étape :
-- Ajouter la persistance WordPress
+- Appliquer l'ensemble des manifests WordPress
 - Tester l'accès HTTP à WordPress
 
 ## Arborescence principale
@@ -47,7 +48,8 @@ group-1070802/
         ├── secret-db.exemple.yaml
         ├── secret-db.yaml
         ├── wordpress-deployment.yaml
-        ├── wordpress-ingest.yaml
+        ├── wordpress-ingress.yaml
+        ├── wordpress-pvc.yaml
         └── wordpress-services.yaml
 ```
 

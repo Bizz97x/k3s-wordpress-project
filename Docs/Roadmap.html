@@ -320,10 +320,10 @@
     <div class="progressWrap">
       <div class="progressTop">
         <b>Progression globale</b>
-        <span><span id="doneCount">6</span>/<span id="totalCount">28</span> tâches</span>
+        <span><span id="doneCount">8</span>/<span id="totalCount">29</span> tâches</span>
       </div>
       <div class="bar" aria-label="Progression">
-        <i id="barFill" style="width: 21%;"></i>
+        <i id="barFill" style="width: 28%;"></i>
       </div>
     </div>
 
@@ -410,36 +410,42 @@
         <li class="item done">
           <input type="checkbox" id="p2-1" data-key="p2-1" checked>
           <label for="p2-1">Créer le namespace <code>wordpress</code>
-            <small>Tout WordPress + DB dedans (exigence projet).</small>
+            <small>Manifeste présent dans <code>k8s/wordpress/namespace.yaml</code>.</small>
           </label>
         </li>
         <li class="item done">
           <input type="checkbox" id="p2-2" data-key="p2-2" checked>
-          <label for="p2-2">Déployer MariaDB + PVC
-            <small>Persistance DB obligatoire (redémarrage pod/nœud). PVC + Deployment + Service MariaDB créés.</small>
+          <label for="p2-2">Créer Secret Kubernetes <code>v1</code>
+            <small>Manifeste présent dans <code>k8s/wordpress/secret-db.yaml</code>.</small>
           </label>
         </li>
         <li class="item done">
           <input type="checkbox" id="p2-3" data-key="p2-3" checked>
-          <label for="p2-3">Créer Secret Kubernetes “v1”
-            <small>Identifiant + mot de passe (pas en clair sur Git).</small>
+          <label for="p2-3">Préparer les manifests MariaDB
+            <small>PVC <code>mariadb-pvc</code>, Deployment <code>mariadb</code>, Service <code>mariadb</code>.</small>
+          </label>
+        </li>
+        <li class="item done">
+          <input type="checkbox" id="p2-4" data-key="p2-4" checked>
+          <label for="p2-4">Préparer les manifests WordPress HTTP
+            <small>Deployment <code>wordpress</code>, Service <code>wordpress</code>, Ingress HTTP <code>web.etna.student</code>.</small>
+          </label>
+        </li>
+        <li class="item done">
+          <input type="checkbox" id="p2-5" data-key="p2-5" checked>
+          <label for="p2-5">Ajouter la persistance WordPress
+            <small>Manifeste <code>wordpress-pvc</code> présent et monté dans le Deployment <code>wordpress</code>.</small>
           </label>
         </li>
         <li class="item">
-          <input type="checkbox" id="p2-4" data-key="p2-4">
-          <label for="p2-4">Déployer WordPress + PVC + Service
-            <small>Deployment + Service créés, PVC WordPress restant.</small>
-          </label>
-        </li>
-        <li class="item">
-          <input type="checkbox" id="p2-5" data-key="p2-5">
-          <label for="p2-5">Créer Ingress HTTP
-            <small>Manifeste Ingress créé avec Traefik, host actuel <code>web.etna.student</code>.</small>
+          <input type="checkbox" id="p2-6" data-key="p2-6">
+          <label for="p2-6">Appliquer et valider la stack WordPress en HTTP
+            <small>Aucune preuve visible dans les fichiers d'un déploiement testé et validé en HTTP.</small>
           </label>
         </li>
       </ul>
 
-      <div class="note">Avancement: MariaDB complet côté manifests, WordPress Deployment + Service + Ingress créés sur <code>web.etna.student</code>. Prochaine étape: ajouter la persistance WordPress puis tester l'accès HTTP.</div>
+      <div class="note">Avancement: MariaDB et WordPress complets côté manifests, y compris le PVC WordPress et l'Ingress HTTP <code>web.etna.student</code>. La validation fonctionnelle HTTP reste à faire.</div>
       <div class="actions">
         <button class="btn toggle" type="button">🧾 <span>Notes</span> <small>(phase 2)</small></button>
       </div>

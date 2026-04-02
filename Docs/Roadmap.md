@@ -4,7 +4,7 @@
 
 ## Progression actuelle
 
-- Taches completees: `7 / 29`
+- Taches completees: `8 / 29`
 - Phases completees: `1 / 6`
 - Etat global: `Phase 1 terminee`, `Phases 2 a 6 en cours`
 
@@ -42,8 +42,8 @@
   - PVC `mariadb-pvc`, Deployment `mariadb`, Service `mariadb`
 - [x] Preparer les manifests WordPress HTTP
   - Deployment `wordpress`, Service `wordpress`, Ingress HTTP `web.etna.student`
-- [ ] Ajouter la persistance WordPress
-  - aucun PVC / volume WordPress visible dans les manifests actuels
+- [x] Ajouter la persistance WordPress
+  - manifeste `wordpress-pvc` present et monte dans le Deployment `wordpress`
 - [ ] Appliquer et valider la stack WordPress en HTTP
   - aucune preuve visible dans les fichiers d'un deploiement teste et valide en HTTP
 
@@ -56,11 +56,11 @@
 - Manifeste Service MariaDB cree (`k8s/wordpress/mariadb-service.yaml`)
 - Manifeste Deployment WordPress cree (`k8s/wordpress/wordpress-deployment.yaml`)
 - Manifeste Service WordPress cree (`k8s/wordpress/wordpress-services.yaml`)
-- Manifeste Ingress HTTP WordPress cree (`k8s/wordpress/wordpress-ingest.yaml`)
+- Manifeste Ingress HTTP WordPress cree (`k8s/wordpress/wordpress-ingress.yaml`)
+- Manifeste PVC WordPress cree (`k8s/wordpress/wordpress-pvc.yaml`)
 - Host HTTP actuel: `web.etna.student`
-- Persistance WordPress absente des manifests actuels
 - Note: les manifests existent, mais aucune validation fonctionnelle HTTP n'est visible dans les fichiers
-- Prochaine etape: ajouter la persistance WordPress, appliquer les manifests puis tester l'acces HTTP
+- Prochaine etape: appliquer les manifests puis tester l'acces HTTP
 
 ### Critere de validation
 
