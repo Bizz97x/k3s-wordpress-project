@@ -74,6 +74,33 @@ Cette partie est importante car les manifests applicatifs, notamment l'IngressRo
 - L'IngressRoute HTTPS reference `certResolver: letsencrypt`
 - La chaine HTTPS est implementee dans les manifests, mais pas validee en production dans la documentation actuelle
 
+## Vault
+
+La phase Vault a ete demarree. Vault a ete installe avec Helm dans le namespace `vault` via la commande :
+
+```bash
+helm install vault hashicorp/vault --namespace vault --create-namespace --set "server.dev.enabled=true"
+```
+
+L'installation actuelle valide le demarrage de la phase Vault, mais elle repose sur un mode `dev` destine au bootstrap et aux tests. Cette installation ne correspond pas encore a une configuration finale d'exploitation.
+
+Etat actuel documente :
+- namespace `vault` cree
+- installation Helm reussie
+- Vault deploye en mode `server.dev.enabled=true`
+
+Ce qui n'est pas encore documente comme realise :
+- auth Kubernetes Vault
+- policies et roles Vault
+- injection des secrets WordPress via Vault
+- remplacement du Secret Kubernetes `wp-db-secret`
+- secrets dynamiques / rotation hebdomadaire
+
+Note :
+- un fichier `k8s/vault/values.yaml` est present dans le depot
+- rien dans les fichiers analyses ne prouve qu'il est deja utilise par l'installation actuellement en place
+- l'etat a documenter ici reste donc l'installation Helm en mode `dev`
+
 ## Limites
 
 - Aucune preuve de validation fonctionnelle HTTP ou HTTPS n'est visible dans les fichiers analyses
@@ -86,6 +113,7 @@ Cette partie est importante car les manifests applicatifs, notamment l'IngressRo
 - Phase 1 : socle K3s et Traefik documentes comme operationnels
 - Phase 2 : architecture WordPress / MariaDB complete cote manifests
 - Phase 3 : HTTPS implemente cote Traefik via IngressRoute, mais non valide en production
+- Phase 4 : Vault installe avec Helm en mode `dev`, mais integration applicative non realisee
 
 ## Prochaines étapes
 

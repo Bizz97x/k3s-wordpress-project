@@ -141,6 +141,52 @@ L'architecture actuelle du projet repose sur un namespace unique `wordpress` qui
 - Le domaine `web.etna.student` est traite comme domaine local / non public dans le contexte du projet
 - Dans ce contexte, le HTTPS est implemente cote manifests mais ne peut pas etre considere comme valide en production sans DNS public joignable
 
+## Vault (Phase 4)
+
+### Installation actuelle
+
+Vault a ete installe sur le cluster avec Helm dans le namespace `vault` via la commande suivante :
+
+```bash
+helm install vault hashicorp/vault --namespace vault --create-namespace --set "server.dev.enabled=true"
+```
+
+Cette commande valide :
+
+- la creation du namespace `vault`
+- l'installation Helm
+- le deploiement initial de Vault
+- un demarrage en mode `dev` pour les premiers tests
+
+### Limites actuelles de cette installation
+
+L'installation actuelle ne doit pas etre consideree comme finale. Le mode `server.dev.enabled=true` sert au bootstrap et aux tests, mais il ne valide pas encore une mise en place plus realiste pour la suite du projet.
+
+Points non encore visibles comme configures dans les fichiers :
+
+- auth Kubernetes Vault
+- policies Vault
+- roles Vault
+- secrets WordPress stockes dans Vault
+- modification des deploiements WordPress / MariaDB pour consommer Vault
+- rotation hebdomadaire ou secrets dynamiques
+- remplacement du Secret Kubernetes `wp-db-secret`
+
+### Lien avec le depot
+
+- un fichier `k8s/vault/values.yaml` est present dans le depot
+- rien dans les fichiers analyses ne prouve qu'il est deja utilise par l'installation actuellement deployee
+- la documentation doit donc refleter en priorite l'installation Helm en mode `dev`
+
+### Prochaines etapes realistes
+
+- verifier l'etat du pod Vault
+- configurer l'auth Kubernetes
+- creer les policies et roles Vault
+- stocker les secrets WordPress dans Vault
+- modifier les deploiements WordPress / MariaDB pour consommer Vault
+- mettre en place la rotation hebdomadaire et les secrets dynamiques
+
 ## Deploiement WordPress (Phase 2)
 
 ### 1. Creer le namespace `wordpress`

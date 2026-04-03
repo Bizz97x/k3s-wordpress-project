@@ -4,7 +4,7 @@
 
 ## Progression actuelle
 
-- Taches completees: `10 / 29`
+- Taches completees: `11 / 29`
 - Phases completees: `1 / 6`
 - Etat global: `Phase 1 terminee`, `Phases 2 a 6 en cours`
 
@@ -105,7 +105,7 @@
 
 ### Taches
 
-- [ ] Installer Vault via Helm (repo officiel)
+- [x] Installer Vault via Helm (repo officiel)
 - [ ] Initialiser / unseal + acces admin
   - documenter les commandes et le stockage des cles (hors Git)
 - [ ] Configurer auth Kubernetes + policies
@@ -116,6 +116,17 @@
   - preuve via TTL / renouvellement / nouveau user-password
 - [ ] Modifier les deploiements WordPress/DB
   - utilisation Vault (injector/agent) a la place du Secret K8s `v1`
+
+### Avancement
+
+- Namespace `vault` cree via l'installation Helm
+- Installation Helm Vault realisee
+- Commande utilisee : `helm install vault hashicorp/vault --namespace vault --create-namespace --set "server.dev.enabled=true"`
+- Vault actuellement deploye en mode `dev`
+- Le Secret Kubernetes `wp-db-secret` reste utilise par les deploiements WordPress / MariaDB existants
+- Note: le demarrage de la phase Vault est valide, mais la configuration finale n'est pas encore en place
+- Limite: auth Kubernetes, policies, roles, injection des secrets, secrets dynamiques et rotation hebdomadaire ne sont pas encore visibles comme configures
+- Prochaines etapes: verifier l'etat du pod Vault, configurer l'auth Kubernetes, creer policies et roles, stocker les secrets WordPress dans Vault, modifier les deploiements pour consommer Vault, puis mettre en place la rotation
 
 ### Critere de validation
 
