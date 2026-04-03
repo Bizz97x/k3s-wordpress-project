@@ -4,7 +4,7 @@
 
 ## Progression actuelle
 
-- Taches completees: `9 / 29`
+- Taches completees: `10 / 29`
 - Phases completees: `1 / 6`
 - Etat global: `Phase 1 terminee`, `Phases 2 a 6 en cours`
 
@@ -44,8 +44,8 @@
   - Deployment `wordpress`, Service `wordpress`, Ingress HTTP `web.etna.student`, IngressRoute HTTP
 - [x] Ajouter la persistance WordPress
   - manifeste `wordpress-pvc` present et monte dans le Deployment `wordpress`
-- [ ] Appliquer et valider la stack WordPress en HTTP
-  - aucune preuve visible dans les fichiers d'un deploiement teste et valide en HTTP
+- [x] Appliquer et valider la stack WordPress en HTTP
+  - acces HTTP valide sur `web.etna.student`, persistance MariaDB et WordPress testee et validee
 
 ### Avancement
 
@@ -60,9 +60,11 @@
 - Manifeste IngressRoute HTTP / HTTPS WordPress cree (`k8s/wordpress/wordpress-ingressroute.yaml`)
 - Manifeste PVC WordPress cree (`k8s/wordpress/wordpress-pvc.yaml`)
 - Host HTTP actuel: `web.etna.student`
-- Note: les manifests existent, mais aucune validation fonctionnelle HTTP n'est visible dans les fichiers
+- WordPress accessible en HTTP via `web.etna.student`
+- Persistance MariaDB et WordPress testee et validee
+- La stack HTTP WordPress est fonctionnelle
 - Note: Ingress et IngressRoute coexistent actuellement dans le dossier
-- Prochaine etape: appliquer les manifests puis tester l'acces HTTP
+- Prochaine etape: poursuivre la mise en place du HTTPS et sa validation
 
 ### Critere de validation
 
