@@ -8,27 +8,90 @@ Ce projet met en place un cluster Kubernetes avec K3s, incluant :
 - Stack d'observabilité
 - Service de documentation Hugo
 
-## État actuel
+## Architecture
 
-Phase 1 terminée :
-- 3 nœuds en état `Ready`
-- Traefik opérationnel
+Le projet s'appuie sur un cluster K3s avec Traefik en frontal. Les manifests actuellement presents dans `k8s/wordpress` decrivent une stack WordPress complete avec persistance et exposition HTTP/HTTPS via Traefik.
 
-Phase 2 en cours :
-- Namespace `wordpress` créé
-- Secret Kubernetes MariaDB créé
-- PVC MariaDB créé
-- Deployment MariaDB créé
-- Service MariaDB créé
-- PVC WordPress créé
-- Deployment WordPress créé
-- Service WordPress créé
-- Ingress HTTP WordPress créé
-- Host HTTP actuel : `web.etna.student`
+```text
+Client
+  |
+  v
+Traefik
+  |- Ingress Kubernetes -> Service wordpress -> Deployment wordpress -> PVC wordpress-pvc
+  |- IngressRoute HTTP  -> Service wordpress
+  |- IngressRoute HTTPS -> Service wordpress
+  |
+  v
+Service mariadb -> Deployment mariadb -> PVC mariadb-pvc
+                     ^
+                     |
+                Secret wp-db-secret
+```
 
-Prochaine étape :
-- Appliquer l'ensemble des manifests WordPress
-- Tester l'accès HTTP à WordPress
+## Déploiement
+
+### Infrastructure
+
+- Cluster K3s fonctionnel
+- Traefik documente comme operationnel dans le projet
+- Namespace applicatif `wordpress`
+
+### Ressources WordPress / MariaDB
+
+- Secret Kubernetes `wp-db-secret`
+- PVC `mariadb-pvc`
+- Deployment `mariadb`
+- Service `mariadb` en `ClusterIP`
+- PVC `wordpress-pvc`
+- Deployment `wordpress`
+- Service `wordpress` en `ClusterIP`
+
+## Réseau
+
+- Ingress Kubernetes `wordpress-ingress`
+- IngressRoute Traefik HTTP `wordpress-http`
+- IngressRoute Traefik HTTPS `wordpress-https`
+- Host actuel : `web.etna.student`
+
+L'Ingress standard Kubernetes et l'IngressRoute Traefik coexistent actuellement dans le dossier. Cela montre une transition vers IngressRoute, mais les fichiers seuls ne prouvent pas quelle ressource est effectivement utilisee en priorite sur le cluster.
+
+## Configuration Traefik (HelmChartConfig)
+
+Traefik est configure sur le cluster via un `HelmChartConfig` applique directement dans le repertoire systeme de K3s : `/var/lib/rancher/k3s/server/manifests`.
+
+Cette configuration n'est pas versionnee dans ce repository, mais elle fait partie de l'infrastructure reelle du projet. Elle permet de completer le chart Traefik fourni par K3s avec les parametres necessaires au HTTPS.
+
+Le `HelmChartConfig` est utilise pour :
+- activer la configuration ACME
+- declarer le resolver `letsencrypt`
+- utiliser la persistance des donnees Traefik dans `/data`
+
+Cette partie est importante car les manifests applicatifs, notamment l'IngressRoute HTTPS, s'appuient sur ce resolver pour demander un certificat. Sans cette configuration appliquee directement sur le cluster, la route HTTPS ne pourrait pas exploiter ACME.
+
+## Sécurité
+
+- Les credentials MariaDB sont portes par le Secret `wp-db-secret`
+- L'IngressRoute HTTPS reference `certResolver: letsencrypt`
+- La chaine HTTPS est implementee dans les manifests, mais pas validee en production dans la documentation actuelle
+
+## Limites
+
+- Aucune preuve de validation fonctionnelle HTTP ou HTTPS n'est visible dans les fichiers analyses
+- La configuration Traefik / ACME via HelmChartConfig n'est pas visible dans `k8s/wordpress`
+- Le domaine `web.etna.student` est traite comme domaine local / non public dans le contexte du projet
+- Dans ce contexte, un certificat Let's Encrypt ne peut pas etre considere comme valide en production sans DNS public joignable
+
+## État d'avancement
+
+- Phase 1 : socle K3s et Traefik documentes comme operationnels
+- Phase 2 : architecture WordPress / MariaDB complete cote manifests
+- Phase 3 : HTTPS implemente cote Traefik via IngressRoute, mais non valide en production
+
+## Prochaines étapes
+
+- Observabilite (Prometheus / Grafana)
+- Gestion des secrets (Vault)
+- Documentation Hugo
 
 ## Arborescence principale
 
@@ -49,6 +112,7 @@ group-1070802/
         ├── secret-db.yaml
         ├── wordpress-deployment.yaml
         ├── wordpress-ingress.yaml
+        ├── wordpress-ingressroute.yaml
         ├── wordpress-pvc.yaml
         └── wordpress-services.yaml
 ```

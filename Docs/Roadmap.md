@@ -4,7 +4,7 @@
 
 ## Progression actuelle
 
-- Taches completees: `8 / 29`
+- Taches completees: `9 / 29`
 - Phases completees: `1 / 6`
 - Etat global: `Phase 1 terminee`, `Phases 2 a 6 en cours`
 
@@ -41,7 +41,7 @@
 - [x] Preparer les manifests MariaDB
   - PVC `mariadb-pvc`, Deployment `mariadb`, Service `mariadb`
 - [x] Preparer les manifests WordPress HTTP
-  - Deployment `wordpress`, Service `wordpress`, Ingress HTTP `web.etna.student`
+  - Deployment `wordpress`, Service `wordpress`, Ingress HTTP `web.etna.student`, IngressRoute HTTP
 - [x] Ajouter la persistance WordPress
   - manifeste `wordpress-pvc` present et monte dans le Deployment `wordpress`
 - [ ] Appliquer et valider la stack WordPress en HTTP
@@ -57,9 +57,11 @@
 - Manifeste Deployment WordPress cree (`k8s/wordpress/wordpress-deployment.yaml`)
 - Manifeste Service WordPress cree (`k8s/wordpress/wordpress-services.yaml`)
 - Manifeste Ingress HTTP WordPress cree (`k8s/wordpress/wordpress-ingress.yaml`)
+- Manifeste IngressRoute HTTP / HTTPS WordPress cree (`k8s/wordpress/wordpress-ingressroute.yaml`)
 - Manifeste PVC WordPress cree (`k8s/wordpress/wordpress-pvc.yaml`)
 - Host HTTP actuel: `web.etna.student`
 - Note: les manifests existent, mais aucune validation fonctionnelle HTTP n'est visible dans les fichiers
+- Note: Ingress et IngressRoute coexistent actuellement dans le dossier
 - Prochaine etape: appliquer les manifests puis tester l'acces HTTP
 
 ### Critere de validation
@@ -75,16 +77,24 @@
 ### Taches
 
 - [ ] Activer Let's Encrypt dans Traefik
-  - ConfigMap + email ETNA + copie dans `/var/lib/rancher/k3s/server/manifests/...`
-- [ ] Ajouter IngressRoute HTTPS WordPress
-  - host + resolver LE, port 443
+  - aucune configuration HelmChartConfig / ACME visible dans les fichiers analyses
+- [x] Ajouter IngressRoute HTTPS WordPress
+  - manifeste present dans `k8s/wordpress/wordpress-ingressroute.yaml` avec `entryPoint websecure` et `certResolver letsencrypt`
 - [ ] Tester la validite du certificat
-  - cadenas navigateur OK, certificat reconnu
+  - implementation visible dans les manifests, mais non validee en production
+
+### Avancement
+
+- Manifeste IngressRoute HTTPS WordPress cree (`k8s/wordpress/wordpress-ingressroute.yaml`)
+- Resolver `letsencrypt` reference dans l'IngressRoute HTTPS
+- Limite: aucune preuve de configuration ACME via HelmChartConfig n'est visible dans les fichiers analyses
+- Limite: le domaine `web.etna.student` est traite comme domaine local / non public dans le contexte du projet
+- Note: le HTTPS est implemente cote manifests, mais ne peut pas etre valide en production sans DNS public joignable
 
 ### Critere de validation
 
 - WordPress accessible en `https://...`
-- Certificat valide
+- Certificat valide en production
 
 ## Phase 4 - Vault (secrets ameliores) - En cours
 
