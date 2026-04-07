@@ -187,6 +187,33 @@ Points non encore visibles comme configures dans les fichiers :
 - modifier les deploiements WordPress / MariaDB pour consommer Vault
 - mettre en place la rotation hebdomadaire et les secrets dynamiques
 
+## Observabilite (Phase 5)
+
+### Etat actuel
+
+La phase observabilite a ete demarree avec l'installation de Prometheus sur le cluster. Cette etape valide le lancement de la phase, mais ne signifie pas encore que la stack complete d'observabilite est finalisee.
+
+### Commande utile
+
+La commande suivante permet de recuperer le mot de passe admin stocke dans le secret cree dans le namespace `monitoring` :
+
+```bash
+kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode ; echo
+```
+
+### Prochaines etapes
+
+- verifier les pods et services de la stack de monitoring
+- confirmer l'acces a l'interface associee au secret admin
+- ajouter le repo Grafana
+- installer Loki
+- poursuivre l'integration de l'observabilite dans la phase 5
+
+### Limites
+
+- aucune configuration Loki n'est encore visible dans le depot
+- Grafana / Loki ne doivent pas encore etre consideres comme totalement installes ou valides tant que cette partie n'est pas documentee plus completement
+
 ## Deploiement WordPress (Phase 2)
 
 ### 1. Creer le namespace `wordpress`

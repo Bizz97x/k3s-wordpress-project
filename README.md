@@ -114,10 +114,11 @@ Note :
 - Phase 2 : architecture WordPress / MariaDB complete cote manifests
 - Phase 3 : HTTPS implemente cote Traefik via IngressRoute, mais non valide en production
 - Phase 4 : Vault installe avec Helm en mode `dev`, mais integration applicative non realisee
+- Phase 5 : observabilite demarree avec l'installation de Prometheus
 
 ## Prochaines étapes
 
-- Observabilite (Prometheus / Grafana)
+- Finaliser l'observabilite (Grafana / Loki)
 - Gestion des secrets (Vault)
 - Documentation Hugo
 

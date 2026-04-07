@@ -153,6 +153,15 @@
 - [ ] Maitriser le filtrage des logs
   - ex: logs d'acces WordPress via labels/namespace/pod
 
+### Avancement
+
+- Phase observabilite demarree
+- Prometheus installe sur le cluster
+- Commande utile pour recuperer le mot de passe admin du secret dans `monitoring` :
+  - `kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode ; echo`
+- Prochaine etape: ajouter le repo Grafana puis installer Loki
+- Note: aucune configuration Loki n'est encore visible dans les fichiers
+
 ### Critere de validation
 
 - Dashboards conformes
