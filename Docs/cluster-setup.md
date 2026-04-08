@@ -136,7 +136,6 @@ L'architecture actuelle du projet repose sur un namespace unique `wordpress` qui
 
 ## Limites
 
-- Aucune preuve de validation fonctionnelle HTTP ou HTTPS n'est visible dans les fichiers analyses
 - La configuration Traefik / ACME via HelmChartConfig n'est pas visible dans `k8s/wordpress` ni dans `Docs/`
 - Le domaine `web.etna.student` est traite comme domaine local / non public dans le contexte du projet
 - Dans ce contexte, le HTTPS est implemente cote manifests mais ne peut pas etre considere comme valide en production sans DNS public joignable
@@ -191,7 +190,16 @@ Points non encore visibles comme configures dans les fichiers :
 
 ### Etat actuel
 
-La phase observabilite a ete demarree avec l'installation de Prometheus sur le cluster. Cette etape valide le lancement de la phase, mais ne signifie pas encore que la stack complete d'observabilite est finalisee.
+La phase observabilite est en cours et deja partiellement validee.
+
+- kube-prometheus-stack est installe dans le namespace `monitoring`
+- Prometheus est installe
+- Grafana est installe et accessible
+- Promtail est deploye
+- Loki est deploye via Helm avec des values custom
+- le cluster K3s utilise reste un cluster a 3 noeuds
+
+Les fichiers `k8s/monitoring/loki-values.yaml` et `k8s/monitoring/loki-values-clean.yaml` montrent un travail de stabilisation de Loki en mode `SingleBinary` avec stockage `filesystem`, caches desactives et ajustements `memberlist`.
 
 ### Commande utile
 
@@ -201,18 +209,35 @@ La commande suivante permet de recuperer le mot de passe admin stocke dans le se
 kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode ; echo
 ```
 
+### Etat Loki / Grafana Explore
+
+Loki et Promtail ont ete deployes dans le namespace `monitoring`. L'ingestion de logs a ete partiellement observee, le pod Loki a pu devenir temporairement `Running` / `Ready` et certains endpoints ont parfois repondu, mais la validation complete de la datasource Loki dans Grafana reste instable sur l'environnement K3s utilise.
+
+Le diagnostic met en evidence :
+
+- readiness Loki instable
+- erreurs gRPC internes sur `9095`
+- erreurs `scheduler` / `querier` / `ingester`
+- erreurs `502` via `loki-gateway`
+- refus de connexion intermittents via le service `loki`
+
+Conclusion :
+
+- Prometheus et Grafana sont exploitables
+- Loki / Promtail sont deployes
+- la validation complete dans Grafana Explore n'est pas finalisee
+
 ### Prochaines etapes
 
 - verifier les pods et services de la stack de monitoring
 - confirmer l'acces a l'interface associee au secret admin
-- ajouter le repo Grafana
-- installer Loki
+- stabiliser la datasource Loki dans Grafana
 - poursuivre l'integration de l'observabilite dans la phase 5
 
 ### Limites
 
-- aucune configuration Loki n'est encore visible dans le depot
-- Grafana / Loki ne doivent pas encore etre consideres comme totalement installes ou valides tant que cette partie n'est pas documentee plus completement
+- Grafana et Prometheus sont exploitables, mais Loki / Promtail ne sont pas encore valides completement
+- la consultation des logs dans Grafana Explore reste instable et doit etre finalisee
 
 ## Deploiement WordPress (Phase 2)
 
@@ -309,9 +334,11 @@ kubectl get ingressroute -n wordpress
 - Manifeste PVC WordPress cree
   - manifeste: `k8s/wordpress/wordpress-pvc.yaml`
 - Host HTTP actuel: `web.etna.student`
-- Note: les manifests HTTP et HTTPS existent, mais aucune validation fonctionnelle n'est visible dans les fichiers
+- WordPress accessible en HTTP via `web.etna.student`
+- Persistance MariaDB et WordPress testee et validee
+- La stack HTTP WordPress est fonctionnelle
 - Note HTTPS: l'IngressRoute HTTPS reference `letsencrypt`, mais la configuration ACME n'est pas visible ici et le domaine `web.etna.student` reste un domaine local / non public
-- Prochaine etape: appliquer l'ensemble des manifests puis tester l'acces HTTP et HTTPS
+- Prochaine etape: poursuivre la validation HTTPS
 
 ## Arborescence actuelle
 
@@ -323,6 +350,11 @@ group-1070802/
 │   ├── Roadmap.md
 │   └── cluster-setup.md
 └── k8s/
+    ├── monitoring/
+    │   ├── loki-values-clean.yaml
+    │   └── loki-values.yaml
+    ├── vault/
+    │   └── values.yaml
     └── wordpress/
         ├── mariadb-deployment.yaml
         ├── mariadb-pvc.yaml

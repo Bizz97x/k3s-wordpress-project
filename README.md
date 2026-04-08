@@ -10,7 +10,7 @@ Ce projet met en place un cluster Kubernetes avec K3s, incluant :
 
 ## Architecture
 
-Le projet s'appuie sur un cluster K3s avec Traefik en frontal. Les manifests actuellement presents dans `k8s/wordpress` decrivent une stack WordPress complete avec persistance et exposition HTTP/HTTPS via Traefik.
+Le projet s'appuie sur un cluster K3s a 3 noeuds avec Traefik en frontal. Les manifests actuellement presents dans `k8s/wordpress` decrivent une stack WordPress complete avec persistance et exposition HTTP/HTTPS via Traefik.
 
 ```text
 Client
@@ -33,6 +33,7 @@ Service mariadb -> Deployment mariadb -> PVC mariadb-pvc
 ### Infrastructure
 
 - Cluster K3s fonctionnel
+- Cluster exploite sur 3 noeuds
 - Traefik documente comme operationnel dans le projet
 - Namespace applicatif `wordpress`
 
@@ -101,24 +102,50 @@ Note :
 - rien dans les fichiers analyses ne prouve qu'il est deja utilise par l'installation actuellement en place
 - l'etat a documenter ici reste donc l'installation Helm en mode `dev`
 
+## Observabilite
+
+La phase observabilite a avance avec le namespace `monitoring` et l'installation de la stack kube-prometheus-stack. Dans l'etat actuel documente :
+
+- Prometheus est installe
+- Grafana est installe et accessible
+- Promtail est deploye
+- Loki est deploye via Helm avec des values custom
+
+Les fichiers `k8s/monitoring/loki-values.yaml` et `k8s/monitoring/loki-values-clean.yaml` montrent une tentative de stabilisation de Loki en mode `SingleBinary` avec stockage `filesystem`, caches desactives et ajustements `memberlist`.
+
+Etat reel a retenir :
+
+- Prometheus et Grafana sont exploitables
+- Loki et Promtail sont deployes
+- le pod Loki a pu atteindre temporairement un etat `Running` / `Ready` et certains endpoints ont parfois repondu
+- la validation complete de Loki dans Grafana Explore n'est pas stabilisee
+
+Le diagnostic a mis en evidence une instabilite persistante de Loki sur cet environnement :
+
+- readiness Loki instable
+- erreurs gRPC internes sur le port `9095`
+- erreurs `scheduler` / `querier` / `ingester`
+- erreurs `502` via `loki-gateway`
+- refus de connexion intermittents via le service `loki`
+
 ## Limites
 
-- Aucune preuve de validation fonctionnelle HTTP ou HTTPS n'est visible dans les fichiers analyses
 - La configuration Traefik / ACME via HelmChartConfig n'est pas visible dans `k8s/wordpress`
 - Le domaine `web.etna.student` est traite comme domaine local / non public dans le contexte du projet
 - Dans ce contexte, un certificat Let's Encrypt ne peut pas etre considere comme valide en production sans DNS public joignable
+- Loki / Promtail sont deployes, mais la validation complete dans Grafana Explore reste instable sur l'environnement K3s utilise
 
 ## État d'avancement
 
 - Phase 1 : socle K3s et Traefik documentes comme operationnels
-- Phase 2 : architecture WordPress / MariaDB complete cote manifests
-- Phase 3 : HTTPS implemente cote Traefik via IngressRoute, mais non valide en production
+- Phase 2 : stack WordPress / MariaDB deployee et validee en HTTP avec persistance
+- Phase 3 : HTTPS implemente cote Traefik, mais non validable proprement en production avec `web.etna.student`
 - Phase 4 : Vault installe avec Helm en mode `dev`, mais integration applicative non realisee
-- Phase 5 : observabilite demarree avec l'installation de Prometheus
+- Phase 5 : observabilite partiellement validee ; Prometheus et Grafana sont exploitables, Loki reste instable
 
 ## Prochaines étapes
 
-- Finaliser l'observabilite (Grafana / Loki)
+- Finaliser l'observabilite (stabiliser Loki / Grafana Explore)
 - Gestion des secrets (Vault)
 - Documentation Hugo
 
@@ -132,6 +159,11 @@ group-1070802/
 │   ├── Roadmap.md
 │   └── cluster-setup.md
 └── k8s/
+    ├── monitoring/
+    │   ├── loki-values-clean.yaml
+    │   └── loki-values.yaml
+    ├── vault/
+    │   └── values.yaml
     └── wordpress/
         ├── mariadb-deployment.yaml
         ├── mariadb-pvc.yaml

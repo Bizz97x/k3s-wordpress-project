@@ -4,9 +4,9 @@
 
 ## Progression actuelle
 
-- Taches completees: `11 / 29`
-- Phases completees: `1 / 6`
-- Etat global: `Phase 1 terminee`, `Phases 2 a 6 en cours`
+- Taches completees: `14 / 29`
+- Phases completees: `2 / 6`
+- Etat global: `Phases 1 et 2 terminees`, `Phases 3 a 6 en cours`
 
 ## Phase 1 - Socle (Cluster K3s OK) - Terminee
 
@@ -27,7 +27,7 @@
 - `kubectl get nodes` -> 3 `Ready`
 - Traefik operationnel
 
-## Phase 2 - WordPress en HTTP (simple) - En cours
+## Phase 2 - WordPress en HTTP (simple) - Terminee
 
 - Objectif: Fonctionnel
 - HTTP avant HTTPS
@@ -78,18 +78,18 @@
 
 ### Taches
 
-- [ ] Activer Let's Encrypt dans Traefik
-  - aucune configuration HelmChartConfig / ACME visible dans les fichiers analyses
+- [x] Activer Let's Encrypt dans Traefik
+  - configuration documentee via HelmChartConfig avec resolver `letsencrypt`
 - [x] Ajouter IngressRoute HTTPS WordPress
   - manifeste present dans `k8s/wordpress/wordpress-ingressroute.yaml` avec `entryPoint websecure` et `certResolver letsencrypt`
 - [ ] Tester la validite du certificat
-  - implementation visible dans les manifests, mais non validee en production
+  - implementation visible dans les manifests, mais non validable proprement en production avec `web.etna.student`
 
 ### Avancement
 
 - Manifeste IngressRoute HTTPS WordPress cree (`k8s/wordpress/wordpress-ingressroute.yaml`)
 - Resolver `letsencrypt` reference dans l'IngressRoute HTTPS
-- Limite: aucune preuve de configuration ACME via HelmChartConfig n'est visible dans les fichiers analyses
+- ACME / Let's Encrypt documente via HelmChartConfig applique sur le cluster
 - Limite: le domaine `web.etna.student` est traite comme domaine local / non public dans le contexte du projet
 - Note: le HTTPS est implemente cote manifests, mais ne peut pas etre valide en production sans DNS public joignable
 
@@ -140,10 +140,10 @@
 
 ### Taches
 
-- [ ] Deployer Prometheus + Grafana (Helm)
+- [x] Deployer Prometheus + Grafana (Helm)
   - collecte metrics cluster + nodes/VM
-- [ ] Deployer Loki + Promtail
-  - logs visibles dans Grafana / Explore
+- [x] Deployer Loki + Promtail
+  - composants deployes, validation Grafana Explore encore instable
 - [ ] Configurer les datasources Grafana
   - Prometheus + Loki
 - [ ] Construire un dashboard Kubernetes + VM
@@ -156,11 +156,17 @@
 ### Avancement
 
 - Phase observabilite demarree
-- Prometheus installe sur le cluster
+- kube-prometheus-stack installe dans `monitoring`
+- Prometheus installe
+- Grafana installe et accessible
+- Loki et Promtail deployes
+- Loki configure via des values custom (`k8s/monitoring/loki-values.yaml` et `k8s/monitoring/loki-values-clean.yaml`)
+- Le pod Loki a pu devenir temporairement `Running` / `Ready` et certains endpoints ont parfois repondu
 - Commande utile pour recuperer le mot de passe admin du secret dans `monitoring` :
   - `kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode ; echo`
-- Prochaine etape: ajouter le repo Grafana puis installer Loki
-- Note: aucune configuration Loki n'est encore visible dans les fichiers
+- Diagnostic: readiness Loki instable, erreurs gRPC `9095`, erreurs `scheduler/querier/ingester`, erreurs `502` via `loki-gateway`, refus de connexion intermittents via le service `loki`
+- Conclusion: Grafana et Prometheus sont exploitables, mais la validation complete de Loki dans Grafana Explore reste instable
+- Prochaine etape: stabiliser Loki et finaliser la datasource / Explore dans Grafana
 
 ### Critere de validation
 
