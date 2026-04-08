@@ -162,10 +162,11 @@
 - Loki et Promtail deployes
 - Loki configure via des values custom (`k8s/monitoring/loki-values.yaml` et `k8s/monitoring/loki-values-clean.yaml`)
 - Le pod Loki a pu devenir temporairement `Running` / `Ready` et certains endpoints ont parfois repondu
+- Les endpoints Loki (`/ready` et certaines requetes API comme `vector(1)+vector(1)`) repondent de maniere intermittente
 - Commande utile pour recuperer le mot de passe admin du secret dans `monitoring` :
   - `kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode ; echo`
-- Diagnostic: readiness Loki instable, erreurs gRPC `9095`, erreurs `scheduler/querier/ingester`, erreurs `502` via `loki-gateway`, refus de connexion intermittents via le service `loki`
-- Conclusion: Grafana et Prometheus sont exploitables, mais la validation complete de Loki dans Grafana Explore reste instable
+- Diagnostic: readiness Loki instable, erreurs gRPC `9095`, erreurs `scheduler/querier/ingester`, erreurs `502` via `loki-gateway`, refus de connexion intermittents via le service `loki`, et erreurs de timeout lors du healthcheck Grafana
+- Conclusion: Grafana et Prometheus sont exploitables, mais Loki reste partiellement fonctionnel et non stable pour une validation complete dans Grafana Explore
 - Prochaine etape: stabiliser Loki et finaliser la datasource / Explore dans Grafana
 
 ### Critere de validation

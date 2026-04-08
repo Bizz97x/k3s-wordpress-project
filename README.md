@@ -120,6 +120,8 @@ Etat reel a retenir :
 - le pod Loki a pu atteindre temporairement un etat `Running` / `Ready` et certains endpoints ont parfois repondu
 - la validation complete de Loki dans Grafana Explore n'est pas stabilisee
 
+Malgre un deploiement fonctionnel, Loki presente des instabilites (timeouts et erreurs de communication interne), empechant une validation complete dans Grafana Explore.
+
 Le diagnostic a mis en evidence une instabilite persistante de Loki sur cet environnement :
 
 - readiness Loki instable

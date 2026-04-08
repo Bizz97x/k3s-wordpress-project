@@ -201,9 +201,9 @@ La phase observabilite est en cours et deja partiellement validee.
 
 Les fichiers `k8s/monitoring/loki-values.yaml` et `k8s/monitoring/loki-values-clean.yaml` montrent un travail de stabilisation de Loki en mode `SingleBinary` avec stockage `filesystem`, caches desactives et ajustements `memberlist`.
 
-### Commande utile
+### Recuperation du mot de passe Grafana
 
-La commande suivante permet de recuperer le mot de passe admin stocke dans le secret cree dans le namespace `monitoring` :
+La commande suivante permet de recuperer le mot de passe admin Grafana apres deploiement :
 
 ```bash
 kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode ; echo
@@ -213,13 +213,32 @@ kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-s
 
 Loki et Promtail ont ete deployes dans le namespace `monitoring`. L'ingestion de logs a ete partiellement observee, le pod Loki a pu devenir temporairement `Running` / `Ready` et certains endpoints ont parfois repondu, mais la validation complete de la datasource Loki dans Grafana reste instable sur l'environnement K3s utilise.
 
-Le diagnostic met en evidence :
+Les endpoints Loki (`/ready` et certaines requetes API comme `vector(1)+vector(1)`) repondent de maniere intermittente. Cependant, Grafana echoue regulierement lors du healthcheck avec des erreurs de timeout. Le service Loki est donc fonctionnel partiellement mais non stable pour une validation complete.
 
-- readiness Loki instable
-- erreurs gRPC internes sur `9095`
+### Diagnostic Loki reel
+
+Problemes rencontres :
+
+- erreurs readiness probe (`503` / `timeout`)
+- erreurs gRPC port `9095` (`DeadlineExceeded`)
 - erreurs `scheduler` / `querier` / `ingester`
+- timeouts lors des requetes depuis Grafana
+- erreurs Grafana : `Unable to connect with Loki`
+- erreurs Grafana : `Client.Timeout exceeded while awaiting headers`
 - erreurs `502` via `loki-gateway`
 - refus de connexion intermittents via le service `loki`
+
+Les tests suivants ont fonctionne ponctuellement :
+
+```bash
+kubectl exec -n monitoring deploy/monitoring-grafana -c grafana -- \
+wget -S -O- "http://<LOKI_IP>:3100/ready"
+
+kubectl exec -n monitoring deploy/monitoring-grafana -c grafana -- \
+wget -S -O- "http://<LOKI_IP>:3100/loki/api/v1/query?query=vector%281%29%2Bvector%281%29"
+```
+
+Ces tests ne sont toutefois pas fiables dans le temps et ne suffisent pas a considerer la datasource Loki comme validee de maniere stable dans Grafana.
 
 Conclusion :
 
