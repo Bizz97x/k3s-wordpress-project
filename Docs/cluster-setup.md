@@ -217,6 +217,29 @@ La collecte et la visualisation des metriques sont fonctionnelles via Prometheus
 
 Le dashboard Kubernetes plus generique teste auparavant ne remontait pas correctement les donnees attendues sur ce cluster. Le choix du dashboard `1860` est donc volontaire, car il est plus coherent avec les metriques effectivement collectees par `node-exporter`.
 
+### Identification des noeuds (node-exporter)
+
+Les pods `node-exporter` sont deployes sous forme de `DaemonSet`. Cela signifie qu'un pod `node-exporter` est lance sur chaque noeud du cluster.
+
+Le nom des pods `node-exporter` (par exemple `monitoring-prometheus-node-exporter-xxxxx`) est genere dynamiquement par Kubernetes et ne correspond pas directement au nom des machines.
+
+Pour faire la correspondance entre un pod `node-exporter` et une machine (`vm-server`, `vm2-agent`, `vm3-agent`), il faut utiliser une commande Kubernetes :
+
+```bash
+kubectl get pods -n monitoring -o wide | grep node-exporter
+```
+
+Dans le resultat :
+
+- la colonne `NODE` permet d'identifier sur quel noeud tourne chaque pod `node-exporter`
+- cela permet de faire le lien entre le pod Kubernetes (`monitoring-prometheus-node-exporter-xxxxx`) et la machine reelle (`vm-server`, `vm2-agent`, `vm3-agent`)
+
+Note importante :
+
+- les noms des pods `node-exporter` changent automatiquement lors des recreations
+- il ne faut donc pas se baser sur ces noms dans Grafana ou dans l'analyse
+- il vaut mieux s'appuyer sur le `nodename` ou sur l'`instance` (IP:9100)
+
 ### Recuperation du mot de passe Grafana
 
 La commande suivante permet de recuperer le mot de passe admin Grafana apres deploiement :
