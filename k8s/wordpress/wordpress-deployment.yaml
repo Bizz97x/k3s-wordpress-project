@@ -12,30 +12,27 @@ spec:
     metadata:
       labels:
         app: wordpress
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "wordpress-role"
+        vault.hashicorp.com/agent-inject-secret-wp-env: "secret/data/wordpress/config"
+        vault.hashicorp.com/agent-inject-template-wp-env: |
+          {{- with secret "secret/data/wordpress/config" -}}
+          export WORDPRESS_DB_HOST="{{ .Data.data.WORDPRESS_DB_HOST }}"
+          export WORDPRESS_DB_NAME="{{ .Data.data.WORDPRESS_DB_NAME }}"
+          export WORDPRESS_DB_USER="{{ .Data.data.WORDPRESS_DB_USER }}"
+          export WORDPRESS_DB_PASSWORD="{{ .Data.data.WORDPRESS_DB_PASSWORD }}"
+          {{- end }}
     spec:
+      serviceAccountName: wordpress-sa
       containers:
       - name: wordpress
         image: wordpress:6.5-apache
+        command: [ "/bin/sh", "-c" ]
+        args:
+        - . /vault/secrets/wp-env && exec docker-entrypoint.sh apache2-foreground
         ports:
         - containerPort: 80
-        env:
-        - name: WORDPRESS_DB_HOST
-          value: mariadb
-        - name: WORDPRESS_DB_NAME
-          valueFrom:
-            secretKeyRef:
-              name: wp-db-secret
-              key: MYSQL_DATABASE
-        - name: WORDPRESS_DB_USER
-          valueFrom:
-            secretKeyRef:
-              name: wp-db-secret
-              key: MYSQL_USER
-        - name: WORDPRESS_DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: wp-db-secret
-              key: MYSQL_PASSWORD
         volumeMounts:
         - name: wordpress-storage
           mountPath: /var/www/html
