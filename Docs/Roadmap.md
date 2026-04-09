@@ -4,7 +4,7 @@
 
 ## Progression actuelle
 
-- Taches completees: `17 / 31`
+- Taches completees: `20 / 32`
 - Phases completees: `2 / 6`
 - Etat global: `Phases 1 et 2 terminees`, `Phases 3 a 6 en cours`
 
@@ -106,27 +106,37 @@
 ### Taches
 
 - [x] Installer Vault via Helm (repo officiel)
-- [ ] Initialiser / unseal + acces admin
-  - documenter les commandes et le stockage des cles (hors Git)
-- [ ] Configurer auth Kubernetes + policies
-  - autoriser les pods a lire les secrets
+- [x] Initialiser / unseal + verifier l'etat du pod Vault
+  - `vault-0` en `Running`, `Initialized: true`, `Sealed: false`
+- [x] Configurer auth Kubernetes + policies
+  - role `wordpress-role` et acces WordPress au secret Vault
+- [x] Valider un POC d'injection Vault sur WordPress
+  - `wordpress-sa`, Vault Agent Injector et fichier `/vault/secrets/wp-env`
 - [ ] Configurer le secrets engine DB
   - users DB temporaires (secrets dynamiques)
 - [ ] Mettre en place rotation hebdomadaire + generation aleatoire
   - preuve via TTL / renouvellement / nouveau user-password
-- [ ] Modifier les deploiements WordPress/DB
-  - utilisation Vault (injector/agent) a la place du Secret K8s `v1`
+- [ ] Finaliser l'integration Vault de tous les deploiements
+  - MariaDB reste provisoirement sur le Secret K8s `wp-db-secret`
 
 ### Avancement
 
 - Namespace `vault` cree via l'installation Helm
 - Installation Helm Vault realisee
 - Commande utilisee : `helm install vault hashicorp/vault --namespace vault --create-namespace --set "server.dev.enabled=true"`
-- Vault actuellement deploye en mode `dev`
-- Le Secret Kubernetes `wp-db-secret` reste utilise par les deploiements WordPress / MariaDB existants
-- Note: le demarrage de la phase Vault est valide, mais la configuration finale n'est pas encore en place
-- Limite: auth Kubernetes, policies, roles, injection des secrets, secrets dynamiques et rotation hebdomadaire ne sont pas encore visibles comme configures
-- Prochaines etapes: verifier l'etat du pod Vault, configurer l'auth Kubernetes, creer policies et roles, stocker les secrets WordPress dans Vault, modifier les deploiements pour consommer Vault, puis mettre en place la rotation
+- Vault operationnel sur le cluster
+- Pod `vault-0` en `Running`, `Initialized: true`, `Sealed: false`
+- `vault-agent-injector` en `Running`
+- Authentification Kubernetes Vault configuree
+- Policy Vault et role `wordpress-role` crees pour WordPress
+- Secret WordPress cree dans Vault a l'emplacement `secret/wordpress/config`
+- ServiceAccount `wordpress-sa` cree dans le namespace `wordpress`
+- Deployment WordPress modifie pour utiliser Vault Agent Injector
+- POC valide : le pod WordPress genere `/vault/secrets/wp-env` avec `WORDPRESS_DB_HOST`, `WORDPRESS_DB_NAME`, `WORDPRESS_DB_USER` et `WORDPRESS_DB_PASSWORD`, puis demarre correctement
+- MariaDB reste pour l'instant sur le Secret Kubernetes `wp-db-secret`
+- Note: une tentative d'integration Vault a ete faite cote MariaDB avec `mariadb-sa`, policy, role et secret dedie, mais le pod est tombe en `CrashLoopBackOff` a cause d'un probleme de demarrage (`mysqld: command not found`)
+- Limite: l'integration complete WordPress + MariaDB, les secrets dynamiques DB, la generation aleatoire et la rotation hebdomadaire ne sont pas encore finalises
+- Prochaines etapes: stabiliser l'approche MariaDB avec Vault, finaliser le secrets engine DB, puis mettre en place la rotation hebdomadaire et la generation aleatoire
 
 ### Critere de validation
 

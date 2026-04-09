@@ -77,30 +77,53 @@ Cette partie est importante car les manifests applicatifs, notamment l'IngressRo
 
 ## Vault
 
-La phase Vault a ete demarree. Vault a ete installe avec Helm dans le namespace `vault` via la commande :
+La phase Vault a avance. Vault est installe et operationnel sur le cluster dans le namespace `vault`.
+
+L'installation initiale a ete lancee avec Helm via la commande :
 
 ```bash
 helm install vault hashicorp/vault --namespace vault --create-namespace --set "server.dev.enabled=true"
 ```
 
-L'installation actuelle valide le demarrage de la phase Vault, mais elle repose sur un mode `dev` destine au bootstrap et aux tests. Cette installation ne correspond pas encore a une configuration finale d'exploitation.
+Etat actuel retenu :
 
-Etat actuel documente :
 - namespace `vault` cree
 - installation Helm reussie
-- Vault deploye en mode `server.dev.enabled=true`
+- pod `vault-0` en `Running`
+- `Initialized: true`
+- `Sealed: false`
+- `vault-agent-injector` en `Running`
 
-Ce qui n'est pas encore documente comme realise :
-- auth Kubernetes Vault
-- policies et roles Vault
-- injection des secrets WordPress via Vault
-- remplacement du Secret Kubernetes `wp-db-secret`
-- secrets dynamiques / rotation hebdomadaire
+Un POC d'integration Vault est maintenant valide cote WordPress :
+
+- un `ServiceAccount` `wordpress-sa` est present dans le namespace `wordpress`
+- l'authentification Kubernetes de Vault est configuree
+- une policy Vault et un role `wordpress-role` ont ete crees pour WordPress
+- un secret WordPress est stocke dans Vault a l'emplacement `secret/wordpress/config`
+- le Deployment WordPress utilise Vault Agent Injector pour generer le fichier `/vault/secrets/wp-env`
+- le pod WordPress charge bien les variables `WORDPRESS_DB_HOST`, `WORDPRESS_DB_NAME`, `WORDPRESS_DB_USER` et `WORDPRESS_DB_PASSWORD` depuis Vault
+- WordPress demarre correctement avec les variables injectees depuis Vault
+
+Ce POC valide donc l'integration applicative Vault sur WordPress.
+
+MariaDB ne doit en revanche pas etre presente comme migree completement vers Vault :
+
+- une tentative d'integration a ete faite avec `mariadb-sa`, une policy, un role et un secret Vault dedie
+- l'injection Vault cote MariaDB semble avoir ete amorcee, mais le pod MariaDB est tombe en `CrashLoopBackOff`
+- l'echec observe est lie au demarrage du conteneur MariaDB (`mysqld: command not found`)
+- pour conserver une stack fonctionnelle, MariaDB reste pour l'instant sur le Secret Kubernetes natif `wp-db-secret`
 
 Note :
 - un fichier `k8s/vault/values.yaml` est present dans le depot
-- rien dans les fichiers analyses ne prouve qu'il est deja utilise par l'installation actuellement en place
-- l'etat a documenter ici reste donc l'installation Helm en mode `dev`
+- le fichier montre notamment `injector.enabled: true`
+- cela reste coherent avec le POC WordPress valide
+
+Ce qui reste a finaliser pour satisfaire completement la consigne Vault :
+
+- integration complete de tous les deploiements applicatifs
+- secrets dynamiques pour la base de donnees
+- generation aleatoire des credentials
+- rotation hebdomadaire des secrets
 
 ## Observabilite
 
@@ -151,7 +174,7 @@ Le diagnostic a mis en evidence une instabilite persistante de Loki sur cet envi
 - Phase 1 : socle K3s et Traefik documentes comme operationnels
 - Phase 2 : stack WordPress / MariaDB deployee et validee en HTTP avec persistance
 - Phase 3 : HTTPS implemente cote Traefik, mais non validable proprement en production avec `web.etna.student`
-- Phase 4 : Vault installe avec Helm en mode `dev`, mais integration applicative non realisee
+- Phase 4 : Vault operationnel, POC WordPress valide, mais integration complete et rotation non finalisees
 - Phase 5 : observabilite partiellement validee ; la supervision metrique Prometheus / Grafana est validee, mais Loki reste instable
 
 ## Prochaines étapes
