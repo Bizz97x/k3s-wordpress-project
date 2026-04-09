@@ -195,11 +195,27 @@ La phase observabilite est en cours et deja partiellement validee.
 - kube-prometheus-stack est installe dans le namespace `monitoring`
 - Prometheus est installe
 - Grafana est installe et accessible
+- la datasource Prometheus est presente dans Grafana
+- les requetes Prometheus fonctionnent dans Grafana Explore, notamment `up`
+- le dashboard `Node Exporter Full` a ete importe avec succes
+- l'affichage CPU / memoire / disque / reseau est valide pour `vm-server`, `vm2-agent` et `vm3-agent`
 - Promtail est deploye
 - Loki est deploye via Helm avec des values custom
 - le cluster K3s utilise reste un cluster a 3 noeuds
 
 Les fichiers `k8s/monitoring/loki-values.yaml` et `k8s/monitoring/loki-values-clean.yaml` montrent un travail de stabilisation de Loki en mode `SingleBinary` avec stockage `filesystem`, caches desactives et ajustements `memberlist`.
+
+La collecte et la visualisation des metriques sont fonctionnelles via Prometheus, Grafana et node-exporter. Les dashboards Grafana ont ete valides avec succes, notamment le dashboard `Node Exporter Full`, qui permet de superviser les ressources des noeuds du cluster (CPU, memoire, disque, reseau). En revanche, la partie logs avec Loki/Promtail reste partiellement deployee mais instable, et n'est pas encore validee completement dans Grafana Explore.
+
+### Dashboard Grafana valide
+
+- Dashboard utilise : `Node Exporter Full`
+- Source : Grafana.com
+- ID : `1860`
+- Usage actuel : base principale de demonstration de l'observabilite
+- Interet : supervision exploitable des noeuds `vm-server`, `vm2-agent` et `vm3-agent`
+
+Le dashboard Kubernetes plus generique teste auparavant ne remontait pas correctement les donnees attendues sur ce cluster. Le choix du dashboard `1860` est donc volontaire, car il est plus coherent avec les metriques effectivement collectees par `node-exporter`.
 
 ### Recuperation du mot de passe Grafana
 
@@ -207,6 +223,22 @@ La commande suivante permet de recuperer le mot de passe admin Grafana apres dep
 
 ```bash
 kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode ; echo
+```
+
+### Acces utiles
+
+#### Port-forward Grafana
+
+```bash
+kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
+```
+
+#### Commandes pratiques
+
+```bash
+kubectl get pods -n monitoring -o wide
+kubectl get svc -n monitoring
+kubectl get endpoints -n monitoring
 ```
 
 ### Etat Loki / Grafana Explore
@@ -245,6 +277,42 @@ Conclusion :
 - Prometheus et Grafana sont exploitables
 - Loki / Promtail sont deployes
 - la validation complete dans Grafana Explore n'est pas finalisee
+
+### Ports utiles du projet
+
+| Port | Composant | Role | Mode d'acces / remarques |
+| --- | --- | --- | --- |
+| `6443` | K3s / Kubernetes API | API server du cluster | acces reseau vers le serveur K3s |
+| `80` | Traefik / WordPress | HTTP | exposition web et service WordPress cote applicatif |
+| `443` | Traefik | HTTPS | exposition web HTTPS via Traefik |
+| `3000` | Grafana | acces local a l'UI | via `kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80` |
+| `9090` | Prometheus | UI / API Prometheus | service interne monitoring, port-forward possible si necessaire |
+| `9093` | Alertmanager | alerting | composant de kube-prometheus-stack, acces interne ou port-forward |
+| `9100` | Node Exporter | metriques noeuds | collecte des metriques systeme des noeuds |
+| `3100` | Loki | API HTTP | acces direct pod/service pour tests et debug |
+| `9095` | Loki | gRPC interne | communication interne Loki ; erreurs observees pendant le debug |
+| `9080` | Promtail | HTTP / metriques | port couramment utilise par Promtail pour son endpoint HTTP ; a verifier selon la release active |
+| `8080` | Traefik dashboard / admin | verification Traefik | mentionne historiquement dans la phase 1 ; exposition effective a verifier sur le cluster |
+| `3306` | MariaDB | base de donnees | service interne dans le namespace `wordpress` |
+| `8200` | Vault | API / UI Vault | acces principal a Vault |
+| `8201` | Vault | communication interne | port interne Vault, selon le mode de deploiement |
+
+### Loki : acces direct, service et gateway
+
+- acces direct pod Loki : utile pour tester rapidement `3100` et verifier `/ready`
+- service `loki` : point d'acces interne attendu pour les requetes HTTP vers Loki
+- `loki-gateway` : couche intermediaire / proxy observee pendant le debug, avec plusieurs erreurs `502`
+
+Cette difference est importante : une reponse ponctuelle sur le pod Loki ne garantit pas forcement un comportement stable via le service `loki` ou via `loki-gateway`, ce qui explique une partie des difficultes de validation dans Grafana.
+
+### Reperes utiles pour ne pas se perdre
+
+- Grafana : port-forward local en `3000`
+- Prometheus : service interne en `9090`
+- Loki : API HTTP en `3100`
+- MariaDB : `3306`
+- K3s API : `6443`
+- Traefik : `80/443`
 
 ### Prochaines etapes
 

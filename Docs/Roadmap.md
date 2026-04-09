@@ -4,7 +4,7 @@
 
 ## Progression actuelle
 
-- Taches completees: `14 / 29`
+- Taches completees: `17 / 31`
 - Phases completees: `2 / 6`
 - Etat global: `Phases 1 et 2 terminees`, `Phases 3 a 6 en cours`
 
@@ -142,12 +142,16 @@
 
 - [x] Deployer Prometheus + Grafana (Helm)
   - collecte metrics cluster + nodes/VM
+- [x] Valider la datasource Prometheus dans Grafana
+  - requetes Explore fonctionnelles, notamment `up`
+- [x] Importer un dashboard de supervision metrique des noeuds
+  - dashboard `Node Exporter Full` (Grafana.com ID `1860`)
+- [x] Valider la visualisation CPU / memoire / disque / reseau
+  - supervision exploitable pour `vm-server`, `vm2-agent` et `vm3-agent`
 - [x] Deployer Loki + Promtail
   - composants deployes, validation Grafana Explore encore instable
-- [ ] Configurer les datasources Grafana
-  - Prometheus + Loki
-- [ ] Construire un dashboard Kubernetes + VM
-  - CPU (limite + reel), RAM (%), connexions TCP, objets K8s + etats
+- [ ] Stabiliser la datasource Loki dans Grafana Explore
+  - healthcheck et requetes encore instables
 - [ ] Construire un dashboard services (WordPress)
   - requetes HTTP + codes (200/401/404/500...)
 - [ ] Maitriser le filtrage des logs
@@ -159,12 +163,18 @@
 - kube-prometheus-stack installe dans `monitoring`
 - Prometheus installe
 - Grafana installe et accessible
+- Datasource Prometheus presente dans Grafana
+- Les requetes Prometheus fonctionnent dans Explore, notamment `up`
+- Dashboard `Node Exporter Full` importe avec succes (Grafana.com ID `1860`)
+- Visualisation CPU / memoire / disque / reseau validee pour `vm-server`, `vm2-agent` et `vm3-agent`
 - Loki et Promtail deployes
 - Loki configure via des values custom (`k8s/monitoring/loki-values.yaml` et `k8s/monitoring/loki-values-clean.yaml`)
 - Le pod Loki a pu devenir temporairement `Running` / `Ready` et certains endpoints ont parfois repondu
 - Les endpoints Loki (`/ready` et certaines requetes API comme `vector(1)+vector(1)`) repondent de maniere intermittente
 - Commande utile pour recuperer le mot de passe admin du secret dans `monitoring` :
   - `kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode ; echo`
+- La supervision metrique via Prometheus + Grafana est validee
+- Note: le dashboard Kubernetes plus generique teste auparavant n'etait pas suffisamment compatible avec les metriques remontees sur ce cluster ; le choix de `Node Exporter Full` est volontaire pour la soutenance et le debug
 - Diagnostic: readiness Loki instable, erreurs gRPC `9095`, erreurs `scheduler/querier/ingester`, erreurs `502` via `loki-gateway`, refus de connexion intermittents via le service `loki`, et erreurs de timeout lors du healthcheck Grafana
 - Conclusion: Grafana et Prometheus sont exploitables, mais Loki reste partiellement fonctionnel et non stable pour une validation complete dans Grafana Explore
 - Prochaine etape: stabiliser Loki et finaliser la datasource / Explore dans Grafana

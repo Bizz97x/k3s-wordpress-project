@@ -108,6 +108,10 @@ La phase observabilite a avance avec le namespace `monitoring` et l'installation
 
 - Prometheus est installe
 - Grafana est installe et accessible
+- La datasource Prometheus est presente dans Grafana
+- Les requetes Prometheus fonctionnent dans Explore, notamment `up`
+- Le dashboard `Node Exporter Full` (Grafana.com ID `1860`) a ete importe avec succes
+- La supervision CPU / memoire / disque / reseau des noeuds est validee
 - Promtail est deploye
 - Loki est deploye via Helm avec des values custom
 
@@ -115,10 +119,15 @@ Les fichiers `k8s/monitoring/loki-values.yaml` et `k8s/monitoring/loki-values-cl
 
 Etat reel a retenir :
 
-- Prometheus et Grafana sont exploitables
+- Prometheus est operationnel
+- Grafana est operationnel
+- la supervision metrique via Prometheus + Grafana est validee
+- le dashboard `Node Exporter Full` constitue la base actuelle de demonstration de l'observabilite
 - Loki et Promtail sont deployes
 - le pod Loki a pu atteindre temporairement un etat `Running` / `Ready` et certains endpoints ont parfois repondu
-- la validation complete de Loki dans Grafana Explore n'est pas stabilisee
+- la validation complete des logs dans Grafana Explore n'est pas finalisee
+
+Le dashboard Kubernetes plus generique teste precedemment ne remontait pas correctement les donnees attendues sur ce cluster. Le choix du dashboard `Node Exporter Full` est volontaire, car il est compatible avec les metriques effectivement collectees par `node-exporter`.
 
 Malgre un deploiement fonctionnel, Loki presente des instabilites (timeouts et erreurs de communication interne), empechant une validation complete dans Grafana Explore.
 
@@ -143,7 +152,7 @@ Le diagnostic a mis en evidence une instabilite persistante de Loki sur cet envi
 - Phase 2 : stack WordPress / MariaDB deployee et validee en HTTP avec persistance
 - Phase 3 : HTTPS implemente cote Traefik, mais non validable proprement en production avec `web.etna.student`
 - Phase 4 : Vault installe avec Helm en mode `dev`, mais integration applicative non realisee
-- Phase 5 : observabilite partiellement validee ; Prometheus et Grafana sont exploitables, Loki reste instable
+- Phase 5 : observabilite partiellement validee ; la supervision metrique Prometheus / Grafana est validee, mais Loki reste instable
 
 ## Prochaines étapes
 
