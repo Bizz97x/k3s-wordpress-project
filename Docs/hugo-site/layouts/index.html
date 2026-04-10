@@ -1,0 +1,42 @@
+{{ define "main" }}
+  <section class="hero">
+    <p class="eyebrow">Documentation technique</p>
+    <h1>{{ .Title }}</h1>
+    <div class="hero-content prose">
+      {{ .Content }}
+    </div>
+  </section>
+
+  <section class="section-overview">
+    <div class="section-heading">
+      <h2>Sections principales</h2>
+      <p>Acces rapide aux principaux volets du projet et a leur etat de documentation.</p>
+    </div>
+
+    <div class="card-grid">
+      <a class="doc-card" href="{{ "/cluster/" | relURL }}">
+        <span class="card-kicker">Infrastructure</span>
+        <h3>Cluster</h3>
+        <p>Architecture K3s, 3 VM, Traefik, reseau et principes d'exposition des services.</p>
+      </a>
+
+      <a class="doc-card" href="{{ "/wordpress/" | relURL }}">
+        <span class="card-kicker">Applicatif</span>
+        <h3>WordPress</h3>
+        <p>Stack WordPress et MariaDB, persistance, services, HTTP et etat reel du deploiement.</p>
+      </a>
+
+      <a class="doc-card" href="{{ "/vault/" | relURL }}">
+        <span class="card-kicker">Secrets</span>
+        <h3>Vault</h3>
+        <p>Installation Helm, mode dev, integration WordPress et limites actuelles sur la gestion des secrets.</p>
+      </a>
+
+      <a class="doc-card" href="{{ "/observabilite/" | relURL }}">
+        <span class="card-kicker">Supervision</span>
+        <h3>Observabilite</h3>
+        <p>Prometheus, Grafana, Loki, Promtail, etat valide des metriques et instabilites restantes.</p>
+      </a>
+    </div>
+  </section>
+{{ end }}

@@ -4,9 +4,9 @@
 
 ## Progression actuelle
 
-- Taches completees: `20 / 32`
-- Phases completees: `2 / 6`
-- Etat global: `Phases 1 et 2 terminees`, `Phases 3 a 6 en cours`
+- Taches completees: `27 / 34`
+- Phases completees: `3 / 6`
+- Etat global: `Phases 1, 2 et 6 fonctionnelles`, `Phases 3 a 5 en cours`
 
 ## Phase 1 - Socle (Cluster K3s OK) - Terminee
 
@@ -194,22 +194,62 @@
 - Dashboards conformes
 - Logs exploitables en soutenance
 
-## Phase 6 - Documentation Hugo (service) - En cours
+## Phase 6 - Documentation Hugo (service) - Fonctionnelle avec limites
 
 - Objectif: HTTPS + Basic Auth
 - Documentation evaluee
 
 ### Taches
 
-- [ ] Creer le site Hugo (theme au choix)
-- [ ] Deployer Hugo sur le cluster
-  - namespace `docs`, service + ingress
-- [ ] Activer HTTPS Let's Encrypt
-  - URL type `https://docs.etna.student`
-- [ ] Mettre en place une authentification basique
-  - middleware Traefik BasicAuth (credentials hors Git)
-- [ ] Rediger une documentation par service
-  - WordPress/DB, Traefik+LE, Vault, Observabilite, Hugo + liens repo
+- [x] Creer le site Hugo
+  - layouts custom utilises a la place d'un theme externe
+- [x] Generer le site statique
+  - generation locale via `hugo` vers `Docs/hugo-site/public/`
+- [x] Deployer nginx sur le cluster
+  - Deployment `hugo-docs` dans le namespace `docs`
+- [x] Exposer le site via Service + IngressRoute HTTP
+  - Service `ClusterIP` + host `docs.etna.student`
+- [x] Mettre en place une authentification basique
+  - middleware Traefik BasicAuth avec secret `docs-basic-auth`
+- [x] Activer HTTPS Let's Encrypt
+  - IngressRoute `websecure` avec `certResolver: letsencrypt`
+- [x] Rediger une documentation par service
+  - pages `cluster`, `wordpress`, `vault`, `observabilite` et `hugo`
+
+### Avancement
+
+- Site Hugo present dans `Docs/hugo-site`
+- Aucun theme externe retenu
+- Choix de layouts custom et d'un CSS local pour rester compatibles avec Hugo `0.111.x`
+- Generation du site validee avec sortie dans `public/`
+- Documentation statique servie par nginx via le Deployment `hugo-docs`
+- Namespace `docs` cree
+- Service `hugo-docs` expose en `ClusterIP`
+- IngressRoute HTTP sur `docs.etna.student`
+- Middleware Traefik `docs-basicauth` present
+- Secret Kubernetes `docs-basic-auth` utilise pour l'authentification
+- IngressRoute HTTPS implementee sur `websecure`
+- `certResolver: letsencrypt` reference sur la route HTTPS
+- Acces HTTP et HTTPS valides avec authentification
+- Les pages de documentation principales sont redigees
+- Une page Hugo dediee a la documentation du service est ajoutee au site lui-meme
+- Un debug specifique a ete mene sur l'image Grafana : image statique correcte, mais balise HTML supprimee au rendu Hugo ; correction via image Markdown standard
+- Le rendu visuel du site a ete ameliore avec une interface sobre de documentation technique
+
+### Notes
+
+- L'usage d'un theme a ete evite volontairement
+- La contrainte principale est la compatibilite avec Hugo `0.111.x`
+- Une solution simple a base de layouts HTML custom a ete privilegiee pour garantir la generation du site
+- Ce choix technique est assume pour privilegier la compatibilite et la maitrise du rendu plutot qu'un theme tiers
+
+### Limites
+
+- le service nginx utilise un volume `emptyDir`
+- le contenu de `public/` doit etre recopie apres recreation du pod
+- aucune image custom ni pipeline de build n'embarque actuellement le site statique
+- le HTTPS est implemente, mais la validite d'un certificat reste dependante du contexte DNS du projet
+- il n'y a pas de CI/CD pour reconstruire et republier automatiquement la documentation
 
 ### Critere de validation
 
@@ -223,7 +263,7 @@
 - [ ] Montrer: HTTPS + certificat valide
 - [ ] Montrer: Vault (status/unseal) + generation/rotation weekly
 - [ ] Montrer: Dashboards Grafana + Explore logs (acces WordPress)
-- [ ] Montrer: Hugo docs HTTPS + basic auth
+- [x] Montrer: Hugo docs HTTPS + basic auth
 
 ## Conseils de suivi
 

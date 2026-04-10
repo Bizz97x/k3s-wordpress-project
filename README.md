@@ -162,12 +162,70 @@ Le diagnostic a mis en evidence une instabilite persistante de Loki sur cet envi
 - erreurs `502` via `loki-gateway`
 - refus de connexion intermittents via le service `loki`
 
+## Documentation Hugo
+
+La documentation du projet est generee avec Hugo sous forme de site statique.
+
+Etat actuel retenu :
+
+- le site Hugo est genere localement dans `Docs/hugo-site`
+- aucun theme externe n'est utilise
+- des layouts HTML et un CSS custom ont ete ecrits pour rester compatibles avec Hugo `0.111.x`
+- l'interface a ete amelioree pour obtenir un rendu de documentation technique plus lisible
+- les sections actuellement documentees sont `cluster`, `wordpress`, `vault`, `observabilite` et `hugo`
+
+La generation du site se fait via :
+
+```bash
+hugo
+```
+
+Le dossier de sortie utilise est `public/`.
+
+### Deploiement
+
+Le site statique est servi sur le cluster par nginx.
+
+- namespace `docs`
+- Deployment `hugo-docs`
+- Service `hugo-docs` en `ClusterIP`
+- IngressRoute Traefik HTTP et HTTPS sur `docs.etna.student`
+
+Le contenu de `Docs/hugo-site/public/` est copie dans le pod nginx. Il n'y a pas d'image Docker custom pour ce service.
+
+### Securite
+
+- Middleware Traefik Basic Auth `docs-basicauth`
+- Secret Kubernetes `docs-basic-auth`
+- authentification obligatoire pour acceder au site
+
+### HTTPS
+
+- IngressRoute HTTPS dediee sur l'entryPoint `websecure`
+- `certResolver: letsencrypt`
+- HTTPS implemente cote Traefik
+
+Dans le contexte du projet, le certificat ne peut toutefois pas etre considere comme forcement valide en environnement local ou sans DNS public joignable.
+
+### Debug et rendu
+
+Un point de debug a ete documente pendant la mise en place du site :
+
+- une image Grafana etait bien presente dans `static/images`, bien copiee dans le pod et correctement servie par nginx
+- le probleme venait du rendu Hugo : une balise HTML `<img>` ecrite dans le Markdown etait supprimee au build
+- la correction retenue a ete d'utiliser une image Markdown standard plutot que d'activer le rendu HTML non securise
+- ce choix conserve une configuration Hugo simple et compatible avec l'environnement actuel
+
 ## Limites
 
 - La configuration Traefik / ACME via HelmChartConfig n'est pas visible dans `k8s/wordpress`
 - Le domaine `web.etna.student` est traite comme domaine local / non public dans le contexte du projet
 - Dans ce contexte, un certificat Let's Encrypt ne peut pas etre considere comme valide en production sans DNS public joignable
 - Loki / Promtail sont deployes, mais la validation complete dans Grafana Explore reste instable sur l'environnement K3s utilise
+- le service Hugo utilise un volume `emptyDir`
+- le contenu de `public/` doit donc etre recopie dans le pod apres recreation ou redemarrage
+- il n'y a pas de pipeline de build d'image pour embarquer automatiquement le site statique
+- il n'y a pas de CI/CD pour regenerer et republier automatiquement la documentation
 
 ## État d'avancement
 
@@ -176,12 +234,13 @@ Le diagnostic a mis en evidence une instabilite persistante de Loki sur cet envi
 - Phase 3 : HTTPS implemente cote Traefik, mais non validable proprement en production avec `web.etna.student`
 - Phase 4 : Vault operationnel, POC WordPress valide, mais integration complete et rotation non finalisees
 - Phase 5 : observabilite partiellement validee ; la supervision metrique Prometheus / Grafana est validee, mais Loki reste instable
+- Phase 6 : documentation Hugo fonctionnelle ; site statique genere, servi par nginx, protege par Basic Auth et expose en HTTP / HTTPS, avec des limites liees a `emptyDir` et au contexte DNS local
 
 ## Prochaines étapes
 
 - Finaliser l'observabilite (stabiliser Loki / Grafana Explore)
 - Gestion des secrets (Vault)
-- Documentation Hugo
+- Industrialiser le deploiement de la documentation Hugo si une persistance ou une image dediee devient necessaire
 
 ## Arborescence principale
 
@@ -193,6 +252,13 @@ group-1070802/
 │   ├── Roadmap.md
 │   └── cluster-setup.md
 └── k8s/
+    ├── docs/
+    │   ├── docs-deployment.yaml
+    │   ├── docs-ingressroute-https.yaml
+    │   ├── docs-ingressroute.yaml
+    │   ├── docs-middleware-basicauth.yaml
+    │   ├── docs-service.yaml
+    │   └── namespace.yaml
     ├── monitoring/
     │   ├── loki-values-clean.yaml
     │   └── loki-values.yaml

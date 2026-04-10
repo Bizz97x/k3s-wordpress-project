@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>http://docs.etna.student/</loc>
+  </url><url>
+    <loc>http://docs.etna.student/categories/</loc>
+  </url><url>
+    <loc>http://docs.etna.student/cluster/</loc>
+  </url><url>
+    <loc>http://docs.etna.student/hugo/</loc>
+  </url><url>
+    <loc>http://docs.etna.student/observabilite/</loc>
+  </url><url>
+    <loc>http://docs.etna.student/tags/</loc>
+  </url><url>
+    <loc>http://docs.etna.student/vault/</loc>
+  </url><url>
+    <loc>http://docs.etna.student/wordpress/</loc>
+  </url>
+</urlset>

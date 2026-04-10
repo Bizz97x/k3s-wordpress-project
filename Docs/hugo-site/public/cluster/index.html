@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Cluster | Documentation Projet K3s</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="page-doc">
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="container site-header-inner">
+        <div class="site-brand">
+          <a class="site-title" href="/">Documentation Projet K3s</a>
+          <p class="site-tagline">Documentation technique du projet K3s</p>
+        </div>
+        <nav class="site-nav" aria-label="Navigation principale">
+          <a class="nav-link" href="/">Accueil</a>
+          <a class="nav-link is-active" href="/cluster/">Cluster</a>
+          <a class="nav-link" href="/wordpress/">WordPress</a>
+          <a class="nav-link" href="/vault/">Vault</a>
+          <a class="nav-link" href="/observabilite/">Observabilite</a>
+          <a class="nav-link" href="/hugo/">Hugo</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-main">
+      <div class="container">
+        
+  <article class="doc-page">
+    <header class="page-header">
+      <p class="eyebrow">Section</p>
+      <h1>Cluster</h1>
+    </header>
+
+    <div class="page-content prose">
+      <h1 id="cluster">Cluster</h1>
+<p>Cette section presente le socle d&rsquo;infrastructure du projet : le cluster K3s, son organisation sur 3 VM, le role de Traefik et l&rsquo;architecture generale qui porte les services documentes dans le depot.</p>
+<h2 id="vue-densemble">Vue d&rsquo;ensemble</h2>
+<p>Le projet repose sur un cluster K3s a 3 noeuds avec Traefik en frontal. La documentation existante decrit une architecture dans laquelle Traefik expose la stack WordPress, tandis que MariaDB reste joignable uniquement en interne.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Client
+</span></span><span style="display:flex;"><span>  |
+</span></span><span style="display:flex;"><span>  v
+</span></span><span style="display:flex;"><span>Traefik
+</span></span><span style="display:flex;"><span>  |- Ingress Kubernetes -&gt; Service wordpress -&gt; Deployment wordpress -&gt; PVC wordpress-pvc
+</span></span><span style="display:flex;"><span>  |- IngressRoute HTTP  -&gt; Service wordpress
+</span></span><span style="display:flex;"><span>  |- IngressRoute HTTPS -&gt; Service wordpress
+</span></span><span style="display:flex;"><span>  |
+</span></span><span style="display:flex;"><span>  v
+</span></span><span style="display:flex;"><span>Service mariadb -&gt; Deployment mariadb -&gt; PVC mariadb-pvc
+</span></span><span style="display:flex;"><span>                     ^
+</span></span><span style="display:flex;"><span>                     |
+</span></span><span style="display:flex;"><span>                Secret wp-db-secret
+</span></span></code></pre></div><h2 id="infrastructure">Infrastructure</h2>
+<p>L&rsquo;infrastructure documentee s&rsquo;appuie sur 3 machines virtuelles :</p>
+<table>
+<thead>
+<tr>
+<th>VM</th>
+<th>Role</th>
+<th>Ressources</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VM-SERVER</td>
+<td><code>k3s-server</code></td>
+<td>2 vCPU / 4 GB RAM</td>
+</tr>
+<tr>
+<td>VM2-Agent</td>
+<td><code>k3s-agent-1</code></td>
+<td>1 vCPU / 1 GB RAM</td>
+</tr>
+<tr>
+<td>VM3-Agent</td>
+<td><code>k3s-agent-2</code></td>
+<td>1 vCPU / 1 GB RAM</td>
+</tr>
+</tbody>
+</table>
+<p>La feuille de route indique que la preparation des 3 VM et l&rsquo;installation du cluster sont terminees. Le critere de validation retenu est un <code>kubectl get nodes</code> montrant 3 noeuds en statut <code>Ready</code>.</p>
+<h2 id="installation-de-k3s">Installation de K3s</h2>
+<p>L&rsquo;installation documentee est la suivante.</p>
+<h3 id="serveur">Serveur</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -sfL https://get.k3s.io | sh -
+</span></span></code></pre></div><h3 id="recuperation-du-token">Recuperation du token</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo cat /var/lib/rancher/k3s/server/node-token
+</span></span></code></pre></div><h3 id="agents">Agents</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -sfL https://get.k3s.io | <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>K3S_URL<span style="color:#f92672">=</span>https://IP_VM1:6443 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>K3S_TOKEN<span style="color:#f92672">=</span>&lt;TOKEN&gt; <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>sh -
+</span></span></code></pre></div><h3 id="verification">Verification</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl get nodes
+</span></span></code></pre></div><p>Le resultat attendu dans la documentation est un cluster compose de <code>vm-server</code>, <code>vm2-agent</code> et <code>vm3-agent</code>, tous en <code>Ready</code>.</p>
+<h2 id="traefik">Traefik</h2>
+<p>Traefik est installe automatiquement avec K3s par defaut. La roadmap le presente comme verifie et operationnel dans la phase de socle du projet.</p>
+<h3 id="verifications-documentees">Verifications documentees</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl get pods -A
+</span></span><span style="display:flex;"><span>kubectl get svc traefik -n kube-system
+</span></span></code></pre></div><p>La documentation associe Traefik a l&rsquo;ecoute sur <code>80/443</code>, avec un dashboard accessible sur <code>8080</code>.</p>
+<h3 id="configuration-https">Configuration HTTPS</h3>
+<p>Le projet s&rsquo;appuie aussi sur une configuration complementaire appliquee directement sur le cluster via un <code>HelmChartConfig</code> place dans :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>/var/lib/rancher/k3s/server/manifests
+</span></span></code></pre></div><p>Cette configuration n&rsquo;est pas versionnee dans le depot, mais elle est decrite comme necessaire pour :</p>
+<ul>
+<li>activer ACME</li>
+<li>declarer le resolver <code>letsencrypt</code></li>
+<li>persister les donnees Traefik dans <code>/data</code></li>
+</ul>
+<p>Ce point est important car l&rsquo;IngressRoute HTTPS de WordPress reference <code>certResolver: letsencrypt</code>.</p>
+<h2 id="architecture-du-projet">Architecture du projet</h2>
+<p>La documentation actuelle fait apparaitre plusieurs espaces de travail logiques sur le cluster :</p>
+<ul>
+<li><code>wordpress</code> pour la stack applicative WordPress / MariaDB</li>
+<li><code>vault</code> pour la gestion des secrets</li>
+<li><code>monitoring</code> pour l&rsquo;observabilite</li>
+</ul>
+<p>Le namespace <code>wordpress</code> concentre aujourd&rsquo;hui les ressources applicatives principales :</p>
+<ul>
+<li>Secret <code>wp-db-secret</code></li>
+<li>PVC <code>mariadb-pvc</code></li>
+<li>Deployment <code>mariadb</code></li>
+<li>Service <code>mariadb</code></li>
+<li>PVC <code>wordpress-pvc</code></li>
+<li>Deployment <code>wordpress</code></li>
+<li>Service <code>wordpress</code></li>
+<li>Ingress <code>wordpress-ingress</code></li>
+<li>IngressRoute <code>wordpress-http</code></li>
+<li>IngressRoute <code>wordpress-https</code></li>
+</ul>
+<h2 id="reseau-et-exposition">Reseau et exposition</h2>
+<p>Les elements reseau utiles a la comprehension de l&rsquo;architecture sont les suivants :</p>
+<ul>
+<li>le service <code>mariadb</code> est expose en <code>ClusterIP</code> sur le port <code>3306</code></li>
+<li>le service <code>wordpress</code> est expose en <code>ClusterIP</code> sur le port <code>80</code></li>
+<li>l&rsquo;host documente pour WordPress est <code>web.etna.student</code></li>
+<li>l&rsquo;Ingress Kubernetes <code>wordpress-ingress</code> route vers <code>wordpress:80</code></li>
+<li>l&rsquo;IngressRoute <code>wordpress-http</code> utilise l&rsquo;entryPoint <code>web</code></li>
+<li>l&rsquo;IngressRoute <code>wordpress-https</code> utilise l&rsquo;entryPoint <code>websecure</code></li>
+</ul>
+<p>La documentation souligne que <code>Ingress</code> et <code>IngressRoute</code> coexistent actuellement dans le dossier <code>k8s/wordpress</code>. Cela montre une transition vers les CRD Traefik, sans permettre d&rsquo;affirmer a partir des seuls fichiers quelle ressource est prioritaire sur le cluster.</p>
+<h2 id="etat-actuel">Etat actuel</h2>
+<p>Au niveau infrastructure, les points suivants sont documentes comme acquis :</p>
+<ul>
+<li>le cluster K3s fonctionne sur 3 noeuds</li>
+<li>Traefik est documente comme operationnel</li>
+<li>le socle K3s / Traefik correspond a une phase terminee dans la roadmap</li>
+</ul>
+<h2 id="limites-connues">Limites connues</h2>
+<ul>
+<li>la configuration Traefik / ACME via <code>HelmChartConfig</code> fait partie de l&rsquo;infrastructure reelle, mais n&rsquo;est pas versionnee dans ce depot</li>
+<li>le domaine <code>web.etna.student</code> est traite comme un domaine local ou non public dans le contexte du projet</li>
+<li>par consequent, la presence des manifests HTTPS ne suffit pas a considerer le HTTPS comme valide en production</li>
+</ul>
+
+    </div>
+  </article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Documentation Projet K3s - Documentation statique Hugo pour le projet K3s, WordPress, Vault et Observabilite.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

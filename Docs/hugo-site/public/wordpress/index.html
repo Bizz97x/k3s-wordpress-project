@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>WordPress | Documentation Projet K3s</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="page-doc">
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="container site-header-inner">
+        <div class="site-brand">
+          <a class="site-title" href="/">Documentation Projet K3s</a>
+          <p class="site-tagline">Documentation technique du projet K3s</p>
+        </div>
+        <nav class="site-nav" aria-label="Navigation principale">
+          <a class="nav-link" href="/">Accueil</a>
+          <a class="nav-link" href="/cluster/">Cluster</a>
+          <a class="nav-link is-active" href="/wordpress/">WordPress</a>
+          <a class="nav-link" href="/vault/">Vault</a>
+          <a class="nav-link" href="/observabilite/">Observabilite</a>
+          <a class="nav-link" href="/hugo/">Hugo</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-main">
+      <div class="container">
+        
+  <article class="doc-page">
+    <header class="page-header">
+      <p class="eyebrow">Section</p>
+      <h1>WordPress</h1>
+    </header>
+
+    <div class="page-content prose">
+      <h1 id="wordpress">WordPress</h1>
+<p>Cette section regroupe la documentation applicative autour du namespace <code>wordpress</code>, de la stack WordPress / MariaDB, de la persistance et de l&rsquo;exposition HTTP et HTTPS telle qu&rsquo;elle est decrite dans les documents existants.</p>
+<h2 id="namespace-et-composants">Namespace et composants</h2>
+<p>La stack applicative est rassemblee dans le namespace <code>wordpress</code>.</p>
+<p>Les ressources actuellement documentees sont les suivantes :</p>
+<ul>
+<li>Secret Kubernetes <code>wp-db-secret</code></li>
+<li>PVC <code>mariadb-pvc</code></li>
+<li>Deployment <code>mariadb</code></li>
+<li>Service <code>mariadb</code></li>
+<li>PVC <code>wordpress-pvc</code></li>
+<li>Deployment <code>wordpress</code></li>
+<li>Service <code>wordpress</code></li>
+<li>Ingress Kubernetes <code>wordpress-ingress</code></li>
+<li>IngressRoute Traefik <code>wordpress-http</code></li>
+<li>IngressRoute Traefik <code>wordpress-https</code></li>
+</ul>
+<h2 id="base-de-donnees-mariadb">Base de donnees MariaDB</h2>
+<p>MariaDB fait partie de la stack applicative de base.</p>
+<ul>
+<li>le Deployment <code>mariadb</code> porte la base de donnees</li>
+<li>le Service <code>mariadb</code> est expose en <code>ClusterIP</code></li>
+<li>le port documente est <code>3306</code></li>
+<li>les credentials utilises par la stack fonctionnelle sont portes par le Secret <code>wp-db-secret</code></li>
+</ul>
+<h2 id="deploiement-wordpress">Deploiement WordPress</h2>
+<p>Le deploiement WordPress repose sur :</p>
+<ul>
+<li>le Deployment <code>wordpress</code></li>
+<li>le Service <code>wordpress</code> en <code>ClusterIP</code></li>
+<li>le port <code>80</code> pour l&rsquo;exposition interne</li>
+<li>le host actuel <code>web.etna.student</code></li>
+</ul>
+<p>La documentation indique que WordPress est accessible en HTTP via <code>web.etna.student</code>.</p>
+<h2 id="persistance">Persistance</h2>
+<p>La persistance est documentee des deux cotes de la stack :</p>
+<ul>
+<li><code>mariadb-pvc</code> pour les donnees MariaDB</li>
+<li><code>wordpress-pvc</code> pour les fichiers WordPress</li>
+</ul>
+<p>La roadmap indique explicitement que la persistance MariaDB et WordPress a ete testee et validee dans la phase HTTP.</p>
+<h2 id="exposition-reseau">Exposition reseau</h2>
+<h3 id="ingress-http">Ingress HTTP</h3>
+<p>L&rsquo;exposition HTTP standard est decrite via l&rsquo;Ingress Kubernetes <code>wordpress-ingress</code> :</p>
+<ul>
+<li>host <code>web.etna.student</code></li>
+<li>backend <code>wordpress:80</code></li>
+</ul>
+<h3 id="ingressroute-http">IngressRoute HTTP</h3>
+<p>Une route Traefik <code>wordpress-http</code> est aussi documentee :</p>
+<ul>
+<li>entryPoint <code>web</code></li>
+<li>host <code>web.etna.student</code></li>
+<li>backend <code>wordpress:80</code></li>
+</ul>
+<h3 id="ingressroute-https">IngressRoute HTTPS</h3>
+<p>Une route Traefik <code>wordpress-https</code> est egalement presente :</p>
+<ul>
+<li>entryPoint <code>websecure</code></li>
+<li>host <code>web.etna.student</code></li>
+<li>backend <code>wordpress:80</code></li>
+<li>TLS avec <code>certResolver: letsencrypt</code></li>
+</ul>
+<h2 id="etat-actuel">Etat actuel</h2>
+<p>La documentation permet de retenir les points suivants comme valides :</p>
+<ul>
+<li>le namespace <code>wordpress</code> est cree</li>
+<li>la stack WordPress / MariaDB est deployee</li>
+<li>WordPress est valide en HTTP</li>
+<li>la persistance MariaDB et WordPress est validee</li>
+<li>les Services <code>wordpress</code> et <code>mariadb</code> existent en <code>ClusterIP</code></li>
+<li>les manifests HTTP et HTTPS sont presents</li>
+</ul>
+<h2 id="limites-et-points-de-vigilance">Limites et points de vigilance</h2>
+<ul>
+<li><code>Ingress</code> et <code>IngressRoute</code> coexistent dans <code>k8s/wordpress</code></li>
+<li>cette coexistence montre une transition vers <code>IngressRoute</code>, mais les fichiers seuls ne permettent pas d&rsquo;affirmer quelle ressource est prioritaire sur le cluster</li>
+<li>le HTTPS est implemente dans les manifests, mais la validite du certificat n&rsquo;est pas demontree en production</li>
+<li>le domaine <code>web.etna.student</code> est traite comme domaine local ou non public dans le contexte du projet</li>
+<li>dans ce contexte, le HTTPS ne peut pas etre considere comme valide en production sans DNS public joignable</li>
+</ul>
+
+    </div>
+  </article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Documentation Projet K3s - Documentation statique Hugo pour le projet K3s, WordPress, Vault et Observabilite.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

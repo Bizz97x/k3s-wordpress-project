@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Observabilite | Documentation Projet K3s</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="page-doc">
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="container site-header-inner">
+        <div class="site-brand">
+          <a class="site-title" href="/">Documentation Projet K3s</a>
+          <p class="site-tagline">Documentation technique du projet K3s</p>
+        </div>
+        <nav class="site-nav" aria-label="Navigation principale">
+          <a class="nav-link" href="/">Accueil</a>
+          <a class="nav-link" href="/cluster/">Cluster</a>
+          <a class="nav-link" href="/wordpress/">WordPress</a>
+          <a class="nav-link" href="/vault/">Vault</a>
+          <a class="nav-link is-active" href="/observabilite/">Observabilite</a>
+          <a class="nav-link" href="/hugo/">Hugo</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-main">
+      <div class="container">
+        
+  <article class="doc-page">
+    <header class="page-header">
+      <p class="eyebrow">Section</p>
+      <h1>Observabilite</h1>
+    </header>
+
+    <div class="page-content prose">
+      <h1 id="observabilite">Observabilite</h1>
+<p>Cette section regroupe l&rsquo;etat actuel de la supervision et de la collecte de logs du projet, en distinguant clairement ce qui est valide cote metriques et ce qui reste instable cote logs.</p>
+<h2 id="perimetre">Perimetre</h2>
+<p>La phase observabilite est documentee dans le namespace <code>monitoring</code> avec :</p>
+<ul>
+<li><code>kube-prometheus-stack</code></li>
+<li>Prometheus</li>
+<li>Grafana</li>
+<li>Loki</li>
+<li>Promtail</li>
+</ul>
+<p>Le cluster observe reste le cluster K3s a 3 noeuds compose de <code>vm-server</code>, <code>vm2-agent</code> et <code>vm3-agent</code>.</p>
+<h2 id="prometheus">Prometheus</h2>
+<p>Prometheus est documente comme installe et operationnel.</p>
+<p>Les points valides dans la documentation sont les suivants :</p>
+<ul>
+<li>Prometheus est installe</li>
+<li>la collecte des metriques est fonctionnelle</li>
+<li>les requetes Prometheus fonctionnent dans Grafana Explore</li>
+<li>la requete <code>up</code> est citee comme exemple de verification</li>
+</ul>
+<h2 id="grafana">Grafana</h2>
+<p>Grafana est documente comme installe et accessible.</p>
+<h3 id="datasource">Datasource</h3>
+<p>La datasource Prometheus est presente dans Grafana et fonctionne. C&rsquo;est la partie actuellement validee de la chaine d&rsquo;observabilite.</p>
+<h3 id="dashboards">Dashboards</h3>
+<p>Le dashboard explicitement valide est :</p>
+<ul>
+<li><code>Node Exporter Full</code></li>
+<li>source Grafana.com</li>
+<li>ID <code>1860</code></li>
+</ul>
+<p>Ce dashboard est retenu comme base actuelle de demonstration car il remonte correctement les indicateurs CPU, memoire, disque et reseau des noeuds.</p>
+<p>La documentation precise aussi qu&rsquo;un dashboard Kubernetes plus generique avait ete teste auparavant, mais qu&rsquo;il ne remontait pas correctement les donnees attendues sur ce cluster.</p>
+<h2 id="loki-et-promtail">Loki et Promtail</h2>
+<p>Promtail est deployee et Loki est deployee via Helm avec des values personnalisees.</p>
+<p>Les fichiers <code>k8s/monitoring/loki-values.yaml</code> et <code>k8s/monitoring/loki-values-clean.yaml</code> sont cites comme traces d&rsquo;un travail de stabilisation en mode <code>SingleBinary</code>, avec stockage <code>filesystem</code>, caches desactives et ajustements <code>memberlist</code>.</p>
+<h2 id="etat-actuel">Etat actuel</h2>
+<p>La documentation permet de distinguer deux niveaux de validation.</p>
+<h3 id="valide">Valide</h3>
+<ul>
+<li>Prometheus est operationnel</li>
+<li>Grafana est operationnel</li>
+<li>la datasource Prometheus est validee</li>
+<li>les requetes Explore sur Prometheus fonctionnent</li>
+<li>le dashboard <code>Node Exporter Full</code> est importe avec succes</li>
+<li>la supervision CPU / memoire / disque / reseau des noeuds est validee</li>
+</ul>
+<h2 id="dashboard-grafana">Dashboard Grafana</h2>
+<p>Voici un apercu du dashboard Grafana utilise pour le monitoring du cluster Kubernetes.</p>
+<p><img src="/images/grafana.png" alt="Dashboard Grafana"></p>
+<p><em>Figure : Dashboard Grafana affichant les metriques du cluster</em></p>
+<h3 id="partiellement-valide-ou-instable">Partiellement valide ou instable</h3>
+<ul>
+<li>Loki et Promtail sont deployes</li>
+<li>le pod Loki a pu atteindre temporairement un etat <code>Running</code> / <code>Ready</code></li>
+<li>certains endpoints Loki ont parfois repondu</li>
+<li>la validation complete des logs dans Grafana Explore n&rsquo;est pas finalisee</li>
+</ul>
+<h2 id="problemes-connus-avec-loki">Problemes connus avec Loki</h2>
+<p>Le diagnostic documente fait apparaitre plusieurs instabilites persistantes :</p>
+<ul>
+<li>readiness Loki instable</li>
+<li>erreurs gRPC internes sur le port <code>9095</code></li>
+<li>erreurs <code>scheduler</code>, <code>querier</code> et <code>ingester</code></li>
+<li>erreurs <code>502</code> via <code>loki-gateway</code></li>
+<li>refus de connexion intermittents via le service <code>loki</code></li>
+<li>timeouts lors du healthcheck Grafana</li>
+</ul>
+<p>Dans cet etat, Grafana et Prometheus sont exploitables pour les metriques, mais Loki ne peut pas encore etre presente comme completement stable pour l&rsquo;exploration des logs.</p>
+<h2 id="limites-actuelles">Limites actuelles</h2>
+<ul>
+<li>la partie metriques est validee, mais la partie logs ne l&rsquo;est pas completement</li>
+<li>la datasource Loki dans Grafana Explore reste instable</li>
+<li>le filtrage de logs pour les services applicatifs n&rsquo;est pas encore demontre comme maitrise</li>
+<li>un dashboard services centre sur WordPress reste a construire d&rsquo;apres la roadmap</li>
+</ul>
+<h2 id="suite-documentee">Suite documentee</h2>
+<p>Les prochaines etapes deja identifiees dans la documentation sont :</p>
+<ul>
+<li>stabiliser la datasource Loki dans Grafana Explore</li>
+<li>construire un dashboard services pour WordPress</li>
+<li>maitriser le filtrage des logs via labels, namespace ou pod</li>
+</ul>
+
+    </div>
+  </article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Documentation Projet K3s - Documentation statique Hugo pour le projet K3s, WordPress, Vault et Observabilite.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

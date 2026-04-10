@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+</head>
+<body class="{{ if .IsHome }}page-home{{ else }}page-doc{{ end }}">
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="container site-header-inner">
+        <div class="site-brand">
+          <a class="site-title" href="{{ "/" | relURL }}">{{ .Site.Title }}</a>
+          <p class="site-tagline">Documentation technique du projet K3s</p>
+        </div>
+        <nav class="site-nav" aria-label="Navigation principale">
+          <a class="nav-link{{ if .IsHome }} is-active{{ end }}" href="{{ "/" | relURL }}">Accueil</a>
+          <a class="nav-link{{ if eq .RelPermalink "/cluster/" }} is-active{{ end }}" href="{{ "/cluster/" | relURL }}">Cluster</a>
+          <a class="nav-link{{ if eq .RelPermalink "/wordpress/" }} is-active{{ end }}" href="{{ "/wordpress/" | relURL }}">WordPress</a>
+          <a class="nav-link{{ if eq .RelPermalink "/vault/" }} is-active{{ end }}" href="{{ "/vault/" | relURL }}">Vault</a>
+          <a class="nav-link{{ if eq .RelPermalink "/observabilite/" }} is-active{{ end }}" href="{{ "/observabilite/" | relURL }}">Observabilite</a>
+          <a class="nav-link{{ if eq .RelPermalink "/hugo/" }} is-active{{ end }}" href="{{ "/hugo/" | relURL }}">Hugo</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-main">
+      <div class="container">
+        {{ block "main" . }}{{ end }}
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>{{ .Site.Title }} - Documentation statique Hugo pour le projet K3s, WordPress, Vault et Observabilite.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

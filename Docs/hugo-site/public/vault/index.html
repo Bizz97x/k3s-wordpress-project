@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vault | Documentation Projet K3s</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="page-doc">
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="container site-header-inner">
+        <div class="site-brand">
+          <a class="site-title" href="/">Documentation Projet K3s</a>
+          <p class="site-tagline">Documentation technique du projet K3s</p>
+        </div>
+        <nav class="site-nav" aria-label="Navigation principale">
+          <a class="nav-link" href="/">Accueil</a>
+          <a class="nav-link" href="/cluster/">Cluster</a>
+          <a class="nav-link" href="/wordpress/">WordPress</a>
+          <a class="nav-link is-active" href="/vault/">Vault</a>
+          <a class="nav-link" href="/observabilite/">Observabilite</a>
+          <a class="nav-link" href="/hugo/">Hugo</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-main">
+      <div class="container">
+        
+  <article class="doc-page">
+    <header class="page-header">
+      <p class="eyebrow">Section</p>
+      <h1>Vault</h1>
+    </header>
+
+    <div class="page-content prose">
+      <h1 id="vault">Vault</h1>
+<p>Cette section decrit l&rsquo;etat actuel de Vault sur le cluster, son mode de deploiement, son integration avec WordPress et les limites encore ouvertes pour la gestion des secrets.</p>
+<h2 id="installation">Installation</h2>
+<p>Vault a ete installe sur le cluster avec Helm dans le namespace <code>vault</code> via la commande suivante :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>helm install vault hashicorp/vault --namespace vault --create-namespace --set <span style="color:#e6db74">&#34;server.dev.enabled=true&#34;</span>
+</span></span></code></pre></div><p>Cette commande correspond a l&rsquo;installation initiale documentee dans le projet.</p>
+<h2 id="mode-de-fonctionnement-actuel">Mode de fonctionnement actuel</h2>
+<p>La documentation precise que Vault est actuellement deploie en mode <code>dev</code>. Ce mode a servi a lancer les premiers tests d&rsquo;integration applicative, mais ne vaut pas finalisation complete de la phase Vault.</p>
+<h2 id="etat-actuel">Etat actuel</h2>
+<p>Les elements suivants sont documentes comme observes sur le cluster :</p>
+<ul>
+<li>le namespace <code>vault</code> est cree</li>
+<li>l&rsquo;installation Helm est reussie</li>
+<li>le pod <code>vault-0</code> est en <code>Running</code></li>
+<li><code>Initialized: true</code></li>
+<li><code>Sealed: false</code></li>
+<li><code>vault-agent-injector</code> est en <code>Running</code></li>
+</ul>
+<p>Un fichier <code>k8s/vault/values.yaml</code> est aussi mentionne dans le depot, avec notamment <code>injector.enabled: true</code>.</p>
+<h2 id="lien-avec-wordpress-et-les-secrets">Lien avec WordPress et les secrets</h2>
+<p>Le lien actuellement valide entre Vault et la stack WordPress est un POC d&rsquo;injection de secrets :</p>
+<ol>
+<li>un <code>ServiceAccount</code> <code>wordpress-sa</code> est present dans le namespace <code>wordpress</code></li>
+<li>l&rsquo;authentification Kubernetes de Vault est configuree</li>
+<li>une policy Vault et un role <code>wordpress-role</code> ont ete crees</li>
+<li>un secret WordPress est stocke dans Vault a l&rsquo;emplacement <code>secret/wordpress/config</code></li>
+<li>le Deployment WordPress utilise Vault Agent Injector</li>
+<li>Vault genere le fichier <code>/vault/secrets/wp-env</code></li>
+<li>WordPress charge <code>WORDPRESS_DB_HOST</code>, <code>WORDPRESS_DB_NAME</code>, <code>WORDPRESS_DB_USER</code> et <code>WORDPRESS_DB_PASSWORD</code> depuis ce fichier</li>
+</ol>
+<p>La documentation considere ce POC comme valide cote WordPress : le pod demarre correctement avec les variables injectees depuis Vault.</p>
+<p>Note technique : dans le manifeste WordPress, le chemin lu par Vault Agent Injector est <code>secret/data/wordpress/config</code>, ce qui correspond a la lecture KV v2 du secret stocke sous <code>secret/wordpress/config</code>.</p>
+<h2 id="ce-qui-nest-pas-encore-configure-ou-finalise">Ce qui n&rsquo;est pas encore configure ou finalise</h2>
+<p>La phase Vault n&rsquo;est pas consideree comme terminee. Les points suivants restent ouverts dans la documentation :</p>
+<ul>
+<li>integration complete de tous les deploiements applicatifs</li>
+<li>configuration du secrets engine database</li>
+<li>secrets dynamiques pour la base de donnees</li>
+<li>generation aleatoire des credentials</li>
+<li>rotation hebdomadaire des secrets</li>
+</ul>
+<h2 id="limites-actuelles">Limites actuelles</h2>
+<p>MariaDB ne doit pas etre presente comme completement migree vers Vault.</p>
+<p>La documentation mentionne :</p>
+<ul>
+<li>une tentative d&rsquo;integration avec <code>mariadb-sa</code>, une policy, un role et un secret dedie</li>
+<li>une injection Vault amorcee cote MariaDB</li>
+<li>un echec du pod MariaDB en <code>CrashLoopBackOff</code></li>
+<li>une erreur observee au demarrage : <code>mysqld: command not found</code></li>
+</ul>
+<p>Pour conserver une stack fonctionnelle, MariaDB reste donc pour l&rsquo;instant sur le Secret Kubernetes natif <code>wp-db-secret</code>.</p>
+<h2 id="prochaines-etapes-realistes">Prochaines etapes realistes</h2>
+<p>Les prochaines etapes deja documentees sont les suivantes :</p>
+<ul>
+<li>stabiliser l&rsquo;approche MariaDB avec Vault sans casser le demarrage du conteneur</li>
+<li>finaliser l&rsquo;integration Vault sur l&rsquo;ensemble de la stack applicative</li>
+<li>configurer le secrets engine database</li>
+<li>mettre en place la rotation hebdomadaire et les secrets dynamiques</li>
+</ul>
+
+    </div>
+  </article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Documentation Projet K3s - Documentation statique Hugo pour le projet K3s, WordPress, Vault et Observabilite.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

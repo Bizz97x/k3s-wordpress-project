@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Hugo | Documentation Projet K3s</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="page-doc">
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="container site-header-inner">
+        <div class="site-brand">
+          <a class="site-title" href="/">Documentation Projet K3s</a>
+          <p class="site-tagline">Documentation technique du projet K3s</p>
+        </div>
+        <nav class="site-nav" aria-label="Navigation principale">
+          <a class="nav-link" href="/">Accueil</a>
+          <a class="nav-link" href="/cluster/">Cluster</a>
+          <a class="nav-link" href="/wordpress/">WordPress</a>
+          <a class="nav-link" href="/vault/">Vault</a>
+          <a class="nav-link" href="/observabilite/">Observabilite</a>
+          <a class="nav-link is-active" href="/hugo/">Hugo</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-main">
+      <div class="container">
+        
+  <article class="doc-page">
+    <header class="page-header">
+      <p class="eyebrow">Section</p>
+      <h1>Hugo</h1>
+    </header>
+
+    <div class="page-content prose">
+      <h1 id="documentation-hugo">Documentation Hugo</h1>
+<h2 id="presentation">Presentation</h2>
+<p>Le service Hugo sert a produire la documentation statique du projet. Il centralise la documentation technique des differentes briques du cluster dans un site simple, lisible et compatible avec l&rsquo;environnement retenu.</p>
+<h2 id="architecture">Architecture</h2>
+<p>Le site est organise autour des repertoires suivants :</p>
+<ul>
+<li><code>content/</code> pour les pages Markdown</li>
+<li><code>layouts/</code> pour les templates HTML custom</li>
+<li><code>static/</code> pour les ressources statiques locales</li>
+<li><code>public/</code> pour les fichiers HTML generes par Hugo</li>
+</ul>
+<p>Les sections actuellement publiees sur le site sont :</p>
+<ul>
+<li><code>cluster</code></li>
+<li><code>wordpress</code></li>
+<li><code>vault</code></li>
+<li><code>observabilite</code></li>
+<li><code>hugo</code></li>
+</ul>
+<h2 id="choix-technique">Choix technique</h2>
+<p>Le projet n&rsquo;utilise pas de theme Hugo externe.</p>
+<p>Ce choix est volontaire pour plusieurs raisons :</p>
+<ul>
+<li>compatibilite avec Hugo <code>0.111.x</code></li>
+<li>maitrise du rendu HTML et CSS</li>
+<li>reduction des risques d&rsquo;incompatibilite avec des themes plus recents</li>
+</ul>
+<p>Le site repose donc sur des layouts custom et un CSS local, avec un rendu sobre de documentation technique.</p>
+<h2 id="generation">Generation</h2>
+<p>La generation locale du site se fait avec :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hugo
+</span></span></code></pre></div><p>La sortie statique est produite dans le dossier <code>public/</code>.</p>
+<h2 id="deploiement">Deploiement</h2>
+<p>Le site statique est servi sur le cluster par nginx.</p>
+<ul>
+<li>Deployment <code>hugo-docs</code></li>
+<li>Service <code>hugo-docs</code></li>
+<li>exposition via Traefik</li>
+<li>host : <code>docs.etna.student</code></li>
+</ul>
+<p>Le deploiement utilise un volume <code>emptyDir</code> monte dans le conteneur nginx pour servir le contenu genere.</p>
+<h2 id="acces">Acces</h2>
+<ul>
+<li>URL HTTP : <code>http://docs.etna.student</code></li>
+<li>URL HTTPS ciblee : <code>https://docs.etna.student</code></li>
+<li>acces protege par Basic Auth</li>
+</ul>
+<h2 id="securite">Securite</h2>
+<p>La protection d&rsquo;acces repose sur Traefik :</p>
+<ul>
+<li>middleware <code>docs-basicauth</code></li>
+<li>secret Kubernetes <code>docs-basic-auth</code></li>
+</ul>
+<p>Les identifiants ne sont pas stockes dans le depot Git.</p>
+<h2 id="https">HTTPS</h2>
+<p>Le service de documentation dispose d&rsquo;une IngressRoute HTTPS :</p>
+<ul>
+<li>entryPoint <code>websecure</code></li>
+<li><code>certResolver: letsencrypt</code></li>
+</ul>
+<p>Le HTTPS est fonctionnel dans la configuration actuelle, mais la validite d&rsquo;un certificat ne peut pas etre consideree comme garantie si le domaine reste dans un contexte DNS local ou non public.</p>
+<h2 id="mise-a-jour">Mise a jour</h2>
+<p>Une mise a jour typique du site suit ce flux :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hugo
+</span></span><span style="display:flex;"><span>kubectl cp public/. docs/&lt;pod&gt;:/usr/share/nginx/html
+</span></span></code></pre></div><p>Ce fonctionnement correspond a l&rsquo;etat actuel du projet : il n&rsquo;y a pas d&rsquo;image Docker custom embarquant automatiquement le site.</p>
+<h2 id="debug">Debug</h2>
+<p>Un cas de debug concret a concerne l&rsquo;integration d&rsquo;une image Grafana dans la section Observabilite :</p>
+<ul>
+<li>l&rsquo;image etait bien presente dans <code>static/images</code></li>
+<li>elle etait bien generee dans <code>public/images</code></li>
+<li>elle etait correctement copiee dans le pod nginx</li>
+<li>le probleme venait du rendu Hugo, qui supprimait une balise HTML <code>&lt;img&gt;</code> dans le Markdown</li>
+</ul>
+<p>La correction retenue a ete d&rsquo;utiliser une image Markdown standard plutot que d&rsquo;activer le rendu HTML non securise.</p>
+<h2 id="limites">Limites</h2>
+<ul>
+<li>volume <code>emptyDir</code> non persistant</li>
+<li>copie manuelle de <code>public/</code> apres recreation du pod</li>
+<li>pas de CI/CD pour automatiser la regeneration et la republication</li>
+<li>pas d&rsquo;image custom dediee au service de documentation</li>
+</ul>
+
+    </div>
+  </article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Documentation Projet K3s - Documentation statique Hugo pour le projet K3s, WordPress, Vault et Observabilite.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

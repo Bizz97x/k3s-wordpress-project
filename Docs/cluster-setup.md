@@ -329,6 +329,64 @@ Conclusion :
 - Loki / Promtail sont deployes
 - la validation complete dans Grafana Explore n'est pas finalisee
 
+## Documentation Hugo
+
+### Deploiement
+
+La documentation est servie comme site statique Hugo dans le namespace `docs`.
+
+- namespace `docs`
+- Deployment `hugo-docs`
+- image nginx utilisee pour servir les fichiers statiques
+- volume `emptyDir` monte dans `/usr/share/nginx/html`
+- copie manuelle du contenu de `Docs/hugo-site/public/` via `kubectl cp`
+
+La generation locale du site se fait avec Hugo dans `Docs/hugo-site`, sans theme externe, a l'aide de layouts HTML minimalistes compatibles avec Hugo `0.111.x`.
+
+Le site produit ensuite un dossier `public/` qui sert d'output statique pour nginx.
+
+### Acces
+
+- URL HTTP : `http://docs.etna.student`
+- URL HTTPS ciblee : `https://docs.etna.student`
+- acces protege par authentification Basic Auth
+
+### Securite
+
+- middleware Traefik `docs-basicauth`
+- secret Kubernetes `docs-basic-auth`
+- identifiants gardes hors Git
+
+### HTTPS
+
+- IngressRoute HTTPS dediee sur l'entryPoint `websecure`
+- `certResolver: letsencrypt`
+- HTTPS implemente cote Traefik pour le service de documentation
+- fonctionnement valide, mais certificat non garanti comme valide si le domaine reste dans un contexte local
+
+### Debug utile
+
+Un point de debug notable a concerne l'integration d'une image Grafana dans la documentation :
+
+- l'image etait bien presente dans `static/images`
+- elle etait correctement copiee dans le pod nginx et servie en HTTP / HTTPS
+- le probleme venait du rendu Hugo, qui supprimait une balise HTML `<img>` ecrite directement dans le Markdown
+- la solution retenue a ete de remplacer cette balise par une image Markdown standard, compatible avec la configuration Hugo actuelle
+
+### Interface
+
+- CSS custom local dans `Docs/hugo-site/static/css/style.css`
+- rendu sobre et lisible de type documentation technique
+- aucun theme externe ni framework CSS
+
+### Limites
+
+- `emptyDir` n'est pas persistant
+- une copie manuelle de `public/` reste necessaire apres recreation du pod
+- aucune image custom n'embarque le site statique
+- pas de CI/CD pour automatiser la regeneration et la republication
+- le certificat HTTPS ne peut pas etre considere comme garanti valide si le domaine reste dans un contexte DNS local ou non public
+
 ### Ports utiles du projet
 
 | Port | Composant | Role | Mode d'acces / remarques |

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Cluster on Documentation Projet K3s</title>
+    <link>http://docs.etna.student/cluster/</link>
+    <description>Recent content in Cluster on Documentation Projet K3s</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr-fr</language><atom:link href="http://docs.etna.student/cluster/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>
