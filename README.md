@@ -171,4 +171,4 @@ kubectl get ingress -n wordpress
 ## Auteur
 
 **Randy Bizet**  
-Étudiant en Master Systèmes & Réseaux
+Étudiant en Master Architecture des Systèmes d'Informations
